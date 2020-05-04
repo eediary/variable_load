@@ -23,6 +23,22 @@ enum SPI_SS_DIR{
 	SPI_INPUT = 0b0, SPI_OUTPUT = 0b1
 };
 private:
+void set_data_mode(SPI_DATA_MODE mode){
+	switch(mode){
+		case SPI_MODE_0:
+		SPCR &= ~((0b1 << CPOL) | (0b1 << CPHA));
+		break;
+		case SPI_MODE_1:
+		SPCR = (SPCR & ~(0b1 << CPOL)) | (0b1 << CPHA);
+		break;
+		case SPI_MODE_2:
+		SPCR = (SPCR & ~(0b1 << CPHA)) | (0b1 << CPOL);
+		break;
+		case SPI_MODE_3:
+		SPCR |= (0b1 << CPHA) | (0b1 << CPOL);
+		break;
+	}
+}
 public:
 HAL_SPI(SPI_MODE mode, SPI_CLK_SEL clk_sel, SPI_BIT_ORDER bit_order = SPI_MSB_FIRST, SPI_SS_DIR ss_dir = SPI_INPUT){
 	// constructor
@@ -65,59 +81,43 @@ void set_spi_mode(SPI_MODE mode)
 void spi_enable(){
 	SPCR |= (1 << SPE);
 }
-
 void spi_disable(){
 	SPCR &= ~(1 << SPE);
-}
-void set_data_mode(SPI_DATA_MODE mode){
-	switch(mode){
-		case SPI_MODE_0:
-		SPCR &= ~((0b1 << CPOL) | (0b1 << CPHA));
-		break;
-		case SPI_MODE_1:
-		SPCR = (SPCR & ~(0b1 << CPOL)) | (0b1 << CPHA);
-		break;
-		case SPI_MODE_2:
-		SPCR = (SPCR & ~(0b1 << CPHA)) | (0b1 << CPOL);
-		break;
-		case SPI_MODE_3:
-		SPCR |= (0b1 << CPHA) | (0b1 << CPOL);
-		break;
-	}
 }
 void set_bit_order(SPI_BIT_ORDER order){
 	SPCR = (SPCR & ~(0b1 << DORD)) | (order << DORD);
 }
 // data transmission
-uint8_t send_byte(uint8_t data){
+uint8_t send_byte(uint8_t data, SPI_DATA_MODE mode){
 	// sends byte, waits for transmission to finish, returns byte
+	set_data_mode(mode);
 	SPDR = data;
 	while(!get_int_flag());
 	return SPDR;
 }
-uint16_t send_dbyte(uint16_t data){
+uint16_t send_dbyte(uint16_t data, SPI_DATA_MODE mode){
 	// sends and returns 16 bits, MSB first
 	uint16_t to_return = 0;
-	to_return = send_byte(data >> 8);
+	to_return = send_byte(data >> 8, mode);
 	to_return <<= 8;
-	to_return += send_byte(data & 0xFF);
+	to_return += send_byte(data & 0xFF, mode);
 	return to_return;
 }
-uint32_t send_tbyte(uint32_t data){
+uint32_t send_tbyte(uint32_t data, SPI_DATA_MODE mode){
 	// sends and returns 24 bits, MSB first
 	// most significant bit is unused (0x00)
 	uint32_t to_return = 0;
-	to_return = send_dbyte(data >> 8);
+	to_return = send_dbyte(data >> 8, mode);
 	to_return <<= 8;
-	to_return += send_byte(data & 0xFF);
+	to_return += send_byte(data & 0xFF, mode);
 	return to_return;
 }
-uint32_t send_qbyte(uint32_t data){
+uint32_t send_qbyte(uint32_t data, SPI_DATA_MODE mode){
 	// sends and returns 32 bits, MSB first
 	uint32_t to_return = 0;
-	to_return = send_dbyte(data >> 16);
+	to_return = send_dbyte(data >> 16, mode);
 	to_return <<= 16;
-	to_return += send_dbyte(data & 0xFFFF);
+	to_return += send_dbyte(data & 0xFFFF, mode);
 	return to_return;
 }
 // Interrupt
