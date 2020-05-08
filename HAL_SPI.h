@@ -2,7 +2,6 @@
 
 #include <avr/io.h>
 
-
 class HAL_SPI{
 public:
 enum SPI_MODE{
@@ -95,6 +94,10 @@ uint8_t send_byte(uint8_t data, SPI_DATA_MODE mode){
 	while(!get_int_flag());
 	return SPDR;
 }
+uint8_t send_byte(uint8_t data, SPI_DATA_MODE mode, SPI_CLK_SEL clk_sel){
+	set_clk(clk_sel);
+	return send_byte(data, mode);
+}
 uint16_t send_dbyte(uint16_t data, SPI_DATA_MODE mode){
 	// sends and returns 16 bits, MSB first
 	uint16_t to_return = 0;
@@ -102,6 +105,10 @@ uint16_t send_dbyte(uint16_t data, SPI_DATA_MODE mode){
 	to_return <<= 8;
 	to_return += send_byte(data & 0xFF, mode);
 	return to_return;
+}
+uint16_t send_dbyte(uint16_t data, SPI_DATA_MODE mode, SPI_CLK_SEL clk_sel){
+	set_clk(clk_sel);
+	return send_dbyte(data, mode);
 }
 uint32_t send_tbyte(uint32_t data, SPI_DATA_MODE mode){
 	// sends and returns 24 bits, MSB first
@@ -112,6 +119,10 @@ uint32_t send_tbyte(uint32_t data, SPI_DATA_MODE mode){
 	to_return += send_byte(data & 0xFF, mode);
 	return to_return;
 }
+uint32_t send_tbyte(uint32_t data, SPI_DATA_MODE mode, SPI_CLK_SEL clk_sel){
+	set_clk(clk_sel);
+	return send_tbyte(data, mode);
+}
 uint32_t send_qbyte(uint32_t data, SPI_DATA_MODE mode){
 	// sends and returns 32 bits, MSB first
 	uint32_t to_return = 0;
@@ -119,6 +130,10 @@ uint32_t send_qbyte(uint32_t data, SPI_DATA_MODE mode){
 	to_return <<= 16;
 	to_return += send_dbyte(data & 0xFFFF, mode);
 	return to_return;
+}
+uint32_t send_qbyte(uint32_t data, SPI_DATA_MODE mode, SPI_CLK_SEL clk_sel){
+	set_clk(clk_sel);
+	return send_qbyte(data, mode);
 }
 // Interrupt
 void int_enable(){
