@@ -4,7 +4,8 @@
 #include "HAL_SPI.h"
 
 #define MAX5216_RESOLUTION (16)
-#define MAX5216_SPI_MODE HAL_SPI::SPI_MODE_1
+#define MAX5216_SPI_MODE (HAL_SPI::SPI_MODE_1)
+#define MAX5216_SPI_CLK_SEL (HAL_SPI::SPI_DIV2) // Max SPI CLK freq = 50 MHz
 
 class MAX5216{
 public:
@@ -40,7 +41,7 @@ MAX5216(HAL_GPIO &gpio_r, HAL_SPI &spi_r, float ref_volt) :
 void nop(){
 	// D23 and D22 should be 0b00
 	cs_gpio.clear_pin();
-	spi.send_tbyte(0, MAX5216_SPI_MODE);
+	spi.send_tbyte(0, MAX5216_SPI_MODE, MAX5216_SPI_CLK_SEL);
 	cs_gpio.set_pin();
 }
 void power_down(MAX5216_POWER_DOWN_MODES mode){
@@ -49,7 +50,7 @@ void power_down(MAX5216_POWER_DOWN_MODES mode){
 	// Rest don't matter
 	uint32_t to_send = ((uint32_t) 0b100 << 21) | ((uint32_t) mode << 18);
 	cs_gpio.clear_pin();
-	spi.send_tbyte(to_send, MAX5216_SPI_MODE);
+	spi.send_tbyte(to_send, MAX5216_SPI_MODE, MAX5216_SPI_CLK_SEL);
 	cs_gpio.set_pin();
 }
 void set_output(float output){
@@ -61,7 +62,7 @@ void set_output(float output){
 	to_send = ((to_send & 0xFFFF) << 6) | ((uint32_t) MAX5216_WRITE_THROUGH << 22);
 	
 	cs_gpio.clear_pin();
-	spi.send_tbyte(to_send, MAX5216_SPI_MODE);
+	spi.send_tbyte(to_send, MAX5216_SPI_MODE, MAX5216_SPI_CLK_SEL);
 	cs_gpio.set_pin();
 }
 };

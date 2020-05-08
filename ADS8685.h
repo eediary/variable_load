@@ -4,9 +4,10 @@
 #include "HAL_SPI.h"
 
 // ADS8685 default configuration
-#define ADS8685_SPI_DATA_MODE HAL_SPI::SPI_MODE_0
-#define ADS8685_DEFAULT_RANGE VREF_x3_BIPOLAR
+#define ADS8685_SPI_DATA_MODE (HAL_SPI::SPI_MODE_0)
+#define ADS8685_DEFAULT_RANGE (VREF_x3_BIPOLAR)
 #define ADS8685_INTERNAL_REF (4.096)
+#define ADS8685_SPI_CLK_SEL (HAL_SPI::SPI_DIV2) // Max SPI CLK freq = 66.67 MHz
 
 // Command bit shifts
 #define OPCODE_SHIFT(x) ((long)(x) << 27)
@@ -85,7 +86,7 @@ private:
 		// transmits command to specified register
 		// default data is 0, and default write select is full
 		cs_pin.clear_pin();
-		uint16_t to_return = spi.send_qbyte(OPCODE_SHIFT(command) | WRITE_SEL_SHIFT(write_sel) | ADDRESS_SHIFT(addr) | DATA_SHIFT(data), ADS8685_SPI_DATA_MODE);
+		uint16_t to_return = spi.send_qbyte(OPCODE_SHIFT(command) | WRITE_SEL_SHIFT(write_sel) | ADDRESS_SHIFT(addr) | DATA_SHIFT(data), ADS8685_SPI_DATA_MODE, ADS8685_SPI_CLK_SEL);
 		cs_pin.set_pin();
 		return to_return;
 	}
@@ -152,7 +153,7 @@ public:
 	float read(){
 		// sends 16 clocks and NOP command
 		cs_pin.clear_pin();
-		uint16_t val = spi.send_dbyte(0, ADS8685_SPI_DATA_MODE);
+		uint16_t val = spi.send_dbyte(0, ADS8685_SPI_DATA_MODE, ADS8685_SPI_CLK_SEL);
 		cs_pin.set_pin();
 		return (val * reference_voltage / ((1UL << resolution) - 1))-output_offset;
 	}
