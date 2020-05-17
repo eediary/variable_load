@@ -8,12 +8,6 @@
 #define SCH_SPI_OP_MODE (HAL_SPI::SPI_MASTER)
 #define SCH_SPI_CLK_SEL (HAL_SPI::SPI_DIV128)
 
-// Load Regulator sampling frequency
-// Set to 1 ms
-#define SCH_LR_TIMER_NUMBER (HAL_Timer::TIMER_TIMER1)
-#define SCH_LR_TIMER_DIV (HAL_Timer::TIMER_CLK_DIV64)
-#define SCH_LR_TIMER_TOP (249)
-
 // ADS8685
 #define SCH_ADS8685_CS_PORT (HAL_GPIO::GPIO_PORTD)
 #define SCH_ADS8685_CS_PIN (HAL_GPIO::GPIO_PIN4)
