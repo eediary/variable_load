@@ -1,16 +1,13 @@
 #pragma once
-
+// Project headers
 #include "schematic.h"
 #include "settings.h"
-
-
-#include <util/delay.h>
-
+// HAL headers
 #include "HAL_Timer.h"
 #include "HAL_SPI.h"
 #include "HAL_TWI.h"
 #include "HAL_GPIO.h"
-
+// Device headers
 #include "ADS8685.h"
 #include "LTC2451.h"
 #include "MAX5216.h"
