@@ -35,8 +35,9 @@ MAX5216 current_control;
 ADS8685 volt_monitor;
 // Data
 float cal_zero; // voltage at zero current
-float target_current;
-float measured_current; // in amps
+float target_current; // desired current going through load, in amps
+float measured_current; // current going through load, in amps
+float control_current; // controlled variable adjusted to get target current, in amps
 float measured_voltage; // in volts
 operation_mode op_mode;
 
@@ -56,7 +57,9 @@ operation_mode get_mode(){
 // Current
 void set_target_current(float val){
 	// val is in amps
+	// control current starts same as target current, adjusted in regulate method
 	target_current = val;
+	control_current = val;
 }
 float get_target_current(){
 	// returns target current in amps
@@ -65,6 +68,14 @@ float get_target_current(){
 float get_measured_current(){
 	// returns measured current in amps
 	return measured_current;
+}
+float get_control_current(){
+	// returns control current, in amps
+	return control_current;
+}
+void adjust_control_current(){
+	// adjusts control current based on error
+	control_current += (target_current - measured_current) * SET_LR_CUR_ERROR_SCALER;
 }
 
 // Voltage

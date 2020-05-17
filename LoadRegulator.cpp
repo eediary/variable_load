@@ -1,7 +1,7 @@
 #include "LoadRegulator.h"
 
 LoadRegulator::LoadRegulator():
-	// Call constructors for class members
+	// Call constructors for class members in initialization list
 	LR_Timer(SET_LR_TIMER_NUMBER, SET_LR_TIMER_DIV, SET_LR_TIMER_TOP),
 	LR_SPI(SCH_SPI_OP_MODE, SCH_SPI_CLK_SEL),
 	LR_TWI(),
@@ -28,15 +28,21 @@ void LoadRegulator::regulate(){
 		// Update measured voltage and current
 		float cur_mon_volt = 0;
 		HAL_TWI::TWI_ERROR error = current_monitor.read(cur_mon_volt);
-		if(error == HAL_TWI::TWI_NO_ERROR)
-			// Only update measured current if no error occurred
+		if(error == HAL_TWI::TWI_NO_ERROR){
+			// Only update measured current on valid read
 			measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
+		}
 		measured_voltage = SCH_ADS8685_GAIN * volt_monitor.read();
 		
 		// Update controls
 		switch(op_mode){
 			case(CC):
-				current_control.set_output(SCH_AMP_TO_VOLT(target_current, cal_zero));
+				current_control.set_output(SCH_AMP_TO_VOLT(control_current, cal_zero));
+				// error correction 
+				if(error == HAL_TWI::TWI_NO_ERROR){
+					// if valid measured current differs from target current, adjust control current
+					adjust_control_current();
+				}
 				break;
 			case(CP):
 				break;
