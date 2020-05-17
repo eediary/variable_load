@@ -33,3 +33,7 @@
 #define SCH_VOLT_TO_AMP(V, OFFSET) (((V)-(OFFSET))/(SCH_VOLT_PER_AMP_COEFF))
 #define SCH_AMP_TO_VOLT(A, OFFSET) ((A)*(SCH_VOLT_PER_AMP_COEFF)+(OFFSET))
 #define SCH_ZERO_AMP_VOLT (0) // any value below 0.5 V will cause load to draw zero current
+
+/********************* Debugger *********************/
+#define SCH_UART_MODE (HAL_UART::UART_MODE_FULL)
+
