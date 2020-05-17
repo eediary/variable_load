@@ -1,8 +1,18 @@
 #include "LoadRegulator.h"
 
-LoadRegulator::LoadRegulator(LTC2451 &LTC2451_r, MAX5216 &MAX5216_r, ADS8685 &ADS8685_r)
-	: current_monitor(LTC2451_r), current_control(MAX5216_r), volt_monitor(ADS8685_r)
+LoadRegulator::LoadRegulator():
+	// Call constructors for class members
+	LR_Timer(SET_LR_TIMER_NUMBER, SET_LR_TIMER_DIV, SET_LR_TIMER_TOP),
+	LR_SPI(SCH_SPI_OP_MODE, SCH_SPI_CLK_SEL),
+	LR_TWI(),
+	LR_CUR_CONT_CS(SCH_MAX5216_CS_PORT, SCH_MAX5216_CS_PIN, SCH_MAX5216_CS_DIR, SCH_MAX5216_CS_VAL),
+	LR_VMON_CS(SCH_ADS8685_CS_PORT, SCH_ADS8685_CS_PIN, SCH_ADS8685_CS_DIR, SCH_ADS8685_CS_VAL),
+	current_monitor(LR_TWI, SCH_LTC2451_REF),
+	current_control(LR_CUR_CONT_CS, LR_SPI, SCH_MAX5216_REF),
+	volt_monitor(LR_VMON_CS, LR_SPI)
 {
+	volt_monitor.set_input_range(SCH_ADS8685_RANGE, SCH_ADS8685_REF);
+	
 	// Puts load regulator into innocuous state
 	// Calibrates zero
 	set_mode(OFF);
@@ -11,35 +21,40 @@ LoadRegulator::LoadRegulator(LTC2451 &LTC2451_r, MAX5216 &MAX5216_r, ADS8685 &AD
 	calibrate_zero();
 }
 void LoadRegulator::regulate(){
-	// Update measured voltage and current
-	float cur_mon_volt = 0;
-	HAL_TWI::TWI_ERROR error = current_monitor.read(cur_mon_volt);
-	if(error == HAL_TWI::TWI_NO_ERROR)
-		// Only update measured current if no error occurred
-		measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
-	measured_voltage = SCH_ADS8685_GAIN * volt_monitor.read();
-	
-	// Update controls
-	switch(op_mode){
-		case(CC):
-			current_control.set_output(SCH_AMP_TO_VOLT(target_current, cal_zero));
-			break;
-		case(CP):
-			break;
-		case(CR):
-			break;
-		case(CV):
-			break;
-		default:
-			current_control.set_output(SCH_ZERO_AMP_VOLT);
-			break;
+	// Only run code if timer flag is set
+	if(LR_Timer.get_int_flag()){
+		LR_Timer.clear_int_flag();
+		
+		// Update measured voltage and current
+		float cur_mon_volt = 0;
+		HAL_TWI::TWI_ERROR error = current_monitor.read(cur_mon_volt);
+		if(error == HAL_TWI::TWI_NO_ERROR)
+			// Only update measured current if no error occurred
+			measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
+		measured_voltage = SCH_ADS8685_GAIN * volt_monitor.read();
+		
+		// Update controls
+		switch(op_mode){
+			case(CC):
+				current_control.set_output(SCH_AMP_TO_VOLT(target_current, cal_zero));
+				break;
+			case(CP):
+				break;
+			case(CR):
+				break;
+			case(CV):
+				break;
+			default:
+				current_control.set_output(SCH_ZERO_AMP_VOLT);
+				break;
+		}
 	}
 }
 void LoadRegulator::calibrate_zero(){
 	// Sets cal_zero to average of several current monitor readings
 	float sum = 0;
 	HAL_TWI::TWI_ERROR error;
-	for(int i = 0; i < LR_CAL_AMOUNT; i++){
+	for(int i = 0; i < SET_LR_CAL_AMOUNT; i++){
 		float temp_val = 0;
 		error = current_monitor.read(temp_val);
 		if(error == HAL_TWI::TWI_NO_ERROR)
@@ -49,5 +64,5 @@ void LoadRegulator::calibrate_zero(){
 			// Error occurred; try again
 			i--;
 	}
-	cal_zero = sum / LR_CAL_AMOUNT;
+	cal_zero = sum / SET_LR_CAL_AMOUNT;
 }

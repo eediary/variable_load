@@ -1,14 +1,20 @@
 #pragma once
 
 #include "schematic.h"
+#include "settings.h"
+
 
 #include <util/delay.h>
+
+#include "HAL_Timer.h"
+#include "HAL_SPI.h"
+#include "HAL_TWI.h"
+#include "HAL_GPIO.h"
+
 #include "ADS8685.h"
 #include "LTC2451.h"
 #include "MAX5216.h"
 #include "RBuffer.h"
-
-#define LR_CAL_AMOUNT 10
 
 class LoadRegulator{
 public:
@@ -17,9 +23,17 @@ enum operation_mode{
 };
 
 private:
-LTC2451 &current_monitor;
-MAX5216 &current_control;
-ADS8685 &volt_monitor;
+// HAL classes
+HAL_Timer LR_Timer;
+HAL_SPI LR_SPI;
+HAL_TWI LR_TWI;
+HAL_GPIO LR_CUR_CONT_CS;
+HAL_GPIO LR_VMON_CS;
+// Device level classes
+LTC2451 current_monitor;
+MAX5216 current_control;
+ADS8685 volt_monitor;
+// Data
 float cal_zero; // voltage at zero current
 float target_current;
 float measured_current; // in amps
@@ -27,7 +41,7 @@ float measured_voltage; // in volts
 operation_mode op_mode;
 
 public:
-LoadRegulator(LTC2451 &LTC2451_r, MAX5216 &MAX5216_r, ADS8685 &ADS8685_r);
+LoadRegulator();
 void regulate();
 void calibrate_zero();
 
