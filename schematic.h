@@ -35,5 +35,29 @@
 #define SCH_ZERO_AMP_VOLT (0) // any value below 0.5 V will cause load to draw zero current
 
 /********************* Debugger *********************/
+// UART
 #define SCH_UART_MODE (HAL_UART::UART_MODE_FULL)
 
+// LEDs
+// Green connects to PE6 and TP1
+// Blue connects to PF0 and TP2
+// Yellow connects to PC7 and TP3
+// Red connects to PC6 and TP4
+#define SCH_LED_GREEN_PORT (HAL_GPIO::GPIO_PORTE)
+#define SCH_LED_GREEN_PIN (HAL_GPIO::GPIO_PIN6)
+#define SCH_LED_GREEN_ACTIVE (LED::LED_ACTIVE_LOW)
+#define SCH_LED_BLUE_PORT (HAL_GPIO::GPIO_PORTF)
+#define SCH_LED_BLUE_PIN (HAL_GPIO::GPIO_PIN0)
+#define SCH_LED_BLUE_ACTIVE (LED::LED_ACTIVE_LOW)
+#define SCH_LED_YELLOW_PORT (HAL_GPIO::GPIO_PORTC)
+#define SCH_LED_YELLOW_PIN (HAL_GPIO::GPIO_PIN7)
+#define SCH_LED_YELLOW_ACTIVE (LED::LED_ACTIVE_LOW)
+#define SCH_LED_RED_PORT (HAL_GPIO::GPIO_PORTC)
+#define SCH_LED_RED_PIN (HAL_GPIO::GPIO_PIN6)
+#define SCH_LED_RED_ACTIVE (LED::LED_ACTIVE_LOW)
+
+// TPs
+#define SCH_TP5_PORT (HAL_GPIO::GPIO_PORTD)
+#define SCH_TP5_PIN (HAL_GPIO::GPIO_PIN7)
+#define SCH_TP6_PORT (HAL_GPIO::GPIO_PORTD)
+#define SCH_TP6_PIN (HAL_GPIO::GPIO_PIN6)
