@@ -3,6 +3,8 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdlib.h>
+
+#include "schematic.h"
 #include "RBuffer.h"
 
 #ifndef F_CPU
@@ -29,15 +31,39 @@ public:
 		UART_STOP_1 = 0b0, UART_STOP_2 = 0b1
 	};
 	
+	// static public members are shared with ISR
+	static volatile const char *tx_char_ptr;
+	static volatile bool tx_busy;
+	static RBuffer <char, UART_RX_BUFFER_SIZE>*RX_Buffer_Ptr;
+	
 private:
-	RBuffer <char, UART_RX_BUFFER_SIZE> RX_Buffer;
+	RBuffer <char, UART_RX_BUFFER_SIZE> RX_Buffer;	
+	
 public:
 	HAL_UART(
-	unsigned long baud_rate, 
-	UART_mode mode,
-	UART_data_bits data_len, 
-	UART_parity parity, 
-	UART_stop_bits num_stop_bits);
+	unsigned long baud_rate = 9600,
+	UART_mode mode = UART_MODE_FULL,
+	UART_data_bits data_len = UART_8_BITS,
+	UART_parity parity = UART_PARITY_NONE,
+	UART_stop_bits num_stop_bits = UART_STOP_1) :
+	RX_Buffer()
+	{
+		// Constructor
+		// Default: 9600 baud, TX & RX, 8N1 format
+		
+		// Set up global pointer to ring buffer
+		RX_Buffer_Ptr = &RX_Buffer;
+		
+		// Configure USART for UART
+		UCSR1C = (UCSR1C & ~(0b11 << UMSEL10)) | (UART_ASYNCH_MODE << UMSEL10);
+		// Configure settings
+		set_baud(baud_rate);
+		set_data_length(data_len);
+		set_parity(parity);
+		set_stop_bits(num_stop_bits);
+		// Configure pins
+		set_mode(mode);
+	}
 	
 	// configuration
 	void set_baud(unsigned long baud_rate){
@@ -101,7 +127,14 @@ public:
 		UCSR1B &= ~(0b1 << UDRIE1);
 	}
 	// higher level rx and tx
-	void send_string(const char *char_ptr);
+	void send_string(const char *char_ptr){
+		// Waits for TX to be free, then transmits null-terminated string
+		while(tx_busy);
+		while(*char_ptr){
+			send_byte(*char_ptr);
+			char_ptr++;
+		}
+	}
 	void send_string(const char *header, int val, const char *footer){
 		char char_buffer[UART_DEBUG_BUFFER_SIZE];
 		itoa(val, char_buffer, 10);
@@ -128,7 +161,22 @@ public:
 		send_string(val);
 		send_string(footer);
 	}
-	bool send_string_int(const char *char_ptr);
+	bool send_string_int(const char *char_ptr){
+		// Transmits null-terminated string using interrupt
+		// Returns true if transmission begins, false if transmitter is taken
+		// NOTE: requires global and USART Data Register Empty Interrupt enabled
+		if(tx_busy){
+			// Transmission ongoing; failure
+			return false;
+			} else{
+			// No transmission ongoing
+			tx_busy = true;
+			//GLOBAL_UART::tx_char_ptr = (volatile const char*)char_ptr;
+			tx_char_ptr = (volatile const char*)char_ptr;
+			enable_data_reg_int();
+			return true;
+		}
+	}
 	int read_rx_buffer(char *buffer, int buffer_size){
 		// Copies contents of ring buffer to provided buffer + null termination
 		// Copied elements are removed from ring buffer
