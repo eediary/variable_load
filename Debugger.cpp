@@ -5,7 +5,7 @@ Debugger::Debugger(long baud_rate, LoadRegulator &LoadRegulator_r):
 	LR_r(LoadRegulator_r)
 {
 	Serial.enable_rx_int();
-	Serial.send_string("Debugger running...");
+	Serial.send_string("Debugger running...\r\n");
 }
 
 void Debugger::run_debugger(){
