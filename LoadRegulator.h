@@ -33,6 +33,8 @@ ADS8685 volt_monitor;
 // Data
 float cal_zero; // voltage at zero current
 float target_current; // desired current going through load, in amps
+float target_power; // desired power dissipated by load, in watts
+float target_resistance; // desired resistance of load, in ohms
 float measured_current; // current going through load, in amps
 float control_current; // controlled variable adjusted to get target current, in amps
 float measured_voltage; // in volts
@@ -70,11 +72,25 @@ float get_control_current(){
 	// returns control current, in amps
 	return control_current;
 }
-void adjust_control_current(){
-	// adjusts control current based on error
-	control_current += (target_current - measured_current) * SET_LR_CUR_ERROR_SCALER;
+void adjust_control_current();
+// Power
+void set_target_power(float val){
+	// val is in watts
+	target_power = val;
 }
-
+float get_target_power(){
+	return target_power;
+}
+// resistance
+void set_target_resistance(float val){
+	// val is in ohms
+	// only updates if val is greater than 0
+	if(val > 0)
+		target_resistance = val;
+}
+float get_target_resistance(){
+	return target_resistance;
+}
 // Voltage
 float get_measured_voltage(){
 	// returns measured volt in volts
