@@ -1,8 +1,9 @@
 #include "Debugger.h"
 
-Debugger::Debugger(long baud_rate, LoadRegulator &LoadRegulator_r):
-	Serial(baud_rate, SCH_UART_MODE, SET_UART_DATA_BITS, SET_UART_PARITY, SET_UART_STOP_BITS),
+Debugger::Debugger(long baud_rate, LoadRegulator &LoadRegulator_r, TempRegulator &TempRegulator_r):
 	LR_r(LoadRegulator_r),
+	TR_r(TempRegulator_r),
+	Serial(baud_rate, SCH_UART_MODE, SET_UART_DATA_BITS, SET_UART_PARITY, SET_UART_STOP_BITS),
 	LED_G(SCH_LED_GREEN_PORT, SCH_LED_GREEN_PIN, SCH_LED_GREEN_ACTIVE),
 	LED_B(SCH_LED_BLUE_PORT, SCH_LED_BLUE_PIN, SCH_LED_BLUE_ACTIVE),
 	LED_Y(SCH_LED_YELLOW_PORT, SCH_LED_YELLOW_PIN, SCH_LED_YELLOW_ACTIVE),
@@ -13,40 +14,46 @@ Debugger::Debugger(long baud_rate, LoadRegulator &LoadRegulator_r):
 }
 
 void Debugger::run_debugger(){
+	// Update values to report
 	float LR_measured_voltage = LR_r.get_measured_voltage();
 	float LR_measured_current = LR_r.get_measured_current();
 	float LR_control_current = LR_r.get_control_current();
+	
+	// Print message
 	LED_G.on();
+	// Message varies based on mode
 	switch(LR_r.get_mode()){
 		case(LoadRegulator::CC):
 			Serial.send_string("CC");
 			Serial.send_string(", ", LR_measured_voltage, 3, " V");
 			Serial.send_string(", ", LR_measured_current, 3, " A");
 			Serial.send_string(" / ", LR_r.get_target_current(), 3, " A");
-			Serial.send_string(" (", LR_control_current, 3, " A)\r\n");
+			Serial.send_string(" (", LR_control_current, 3, " A)");
 			break;
 		case(LoadRegulator::CP):
 			Serial.send_string("CP");
 			Serial.send_string(", ", LR_measured_voltage, 3, " V");
 			Serial.send_string(", ", LR_measured_voltage * LR_measured_current, 3, " W");
 			Serial.send_string(" / ", LR_r.get_target_power(), 3, " W");
-			Serial.send_string(" (", LR_control_current, 3, " A)\r\n");
+			Serial.send_string(" (", LR_control_current, 3, " A)");
 			break;
 		case(LoadRegulator::CR):
 			Serial.send_string("CR");
 			Serial.send_string(", ", LR_measured_voltage, 3, " V");
 			Serial.send_string(", ", LR_measured_voltage / LR_measured_current, 3, " R");
 			Serial.send_string(" / ", LR_r.get_target_resistance(), 3, " R");
-			Serial.send_string(" (", LR_control_current, 3, " A)\r\n");
+			Serial.send_string(" (", LR_control_current, 3, " A)");
 			break;
 		case(LoadRegulator::CV):
-			Serial.send_string("CV: nothing here yet\r\n");
+			Serial.send_string("CV: nothing here yet");
 			break;
 		case(LoadRegulator::OFF):
 			Serial.send_string("OFF");
-			Serial.send_string(", ", LR_measured_voltage, 3, " V\r\n");
+			Serial.send_string(", ", LR_measured_voltage, 3, "");
 			break;
 	}
+	Serial.send_string(", ", TR_r.get_temp_volt(), 3, " V");
+	Serial.send_string(", ", TR_r.get_duty_cycle(), "%\r\n");
 	LED_G.off();
 	
 	// Check input
