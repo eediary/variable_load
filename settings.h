@@ -28,3 +28,6 @@
 #define SET_UART_CHAR_BUFFER_SIZE (20)
 // Baud rate
 #define SET_DEBUGGER_BAUD (57600)
+
+/********************* Temp Regulator *********************/
+#define SET_TR_ADC_ADJ (HAL_ADC::ADC_RADJUST)

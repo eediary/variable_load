@@ -61,3 +61,23 @@
 #define SCH_TP5_PIN (HAL_GPIO::GPIO_PIN7)
 #define SCH_TP6_PORT (HAL_GPIO::GPIO_PORTD)
 #define SCH_TP6_PIN (HAL_GPIO::GPIO_PIN6)
+
+/********************* Temp Regulator *********************/
+// ADC
+#define SCH_TR_ADC_DIV (HAL_ADC::ADC_DIV128)
+#define SCH_TR_ADC_REF (HAL_ADC::ADC_AVCC)
+#define SCH_TR_ADC_REF_VOLT (5.0)
+#define SCH_TR_ADC_RESOLUTION (10)
+#define SCH_TR_ADC_MASK (0b0000000000000010) // disable ADC1 digital input buffer
+#define SCH_TR_ADC_TO_VOLT(C) (C * SCH_TR_ADC_REF_VOLT / (1 << SCH_TR_ADC_RESOLUTION))
+#define SCH_TR_ADC_TEMP_MUX (HAL_ADC::ADC_ADC1) // temp ADC input on ADC 1
+#define SCH_TR_VOLT_TO_TEMP(V) (V * 1.0 + 0) // converts voltage to temperature
+
+// PWM
+// Fan is expecting PWM frequency around 25 kHz
+// With 16 MHz clock, divided by 1, PWM output frequency is 31.25 kHz
+#define SCH_TR_PWM_MODE (HAL_PWM::PWM_PHASE_0XFF)
+#define SCH_TR_PWM_CLK_SEL (HAL_PWM::PWM_CLK_IO)
+#define SCH_TR_PWM_OUTPUT_MODE (HAL_PWM::PWM_NONINVERTED)
+#define SCH_TR_PWM_VOLT_MIN (1.782)
+#define SCH_TR_PWM_VOLT_MAX (4.995)
