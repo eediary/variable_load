@@ -14,9 +14,13 @@
 // Current control parameters
 #define SET_LR_CUR_ERROR_SCALER (0.5)
 // Zero current calibration amount
-#define SET_LR_CAL_AMOUNT 10
+#define SET_LR_CAL_AMOUNT (10)
+// Initial resistance
+#define SET_LR_INIT_RES (1000)
 
 /********************* Debugger *********************/
+// Define DEBUG as 1 to enable debugger
+#define DEBUG 1
 // UART settings
 #define SET_UART_DATA_BITS (HAL_UART::UART_8_BITS)
 #define SET_UART_PARITY (HAL_UART::UART_PARITY_NONE)
