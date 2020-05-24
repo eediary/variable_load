@@ -35,6 +35,7 @@ float cal_zero; // voltage at zero current
 float target_current; // desired current going through load, in amps
 float target_power; // desired power dissipated by load, in watts
 float target_resistance; // desired resistance of load, in ohms
+float target_voltage; // desired voltage across load, in volts
 float measured_current; // current going through load, in amps
 float control_current; // controlled variable adjusted to get target current, in amps
 float measured_voltage; // in volts
@@ -95,6 +96,13 @@ float get_target_resistance(){
 float get_measured_voltage(){
 	// returns measured volt in volts
 	return measured_voltage;
+}
+void set_target_voltage(float val){
+	// val is in volts
+	target_voltage = val;
+}
+float get_target_voltage(){
+	return target_voltage;
 }
 
 };

@@ -14,8 +14,9 @@ LoadRegulator::LoadRegulator():
 	// Configure voltage monitor ADC
 	volt_monitor.set_input_range(SCH_ADS8685_RANGE, SCH_ADS8685_REF);
 	
-	// Set initial resistance value
+	// Set initial resistance and voltage values
 	target_resistance = SET_LR_INIT_RES;
+	target_voltage = SET_LR_CV_INIT_V;
 	
 	// Puts load regulator into innocuous state
 	// Calibrates zero
@@ -52,6 +53,9 @@ void LoadRegulator::regulate(){
 				}
 				break;
 			case(CV):
+				// Adjust control current and update DAC output
+				adjust_control_current();
+				current_control.set_output(SCH_AMP_TO_VOLT(control_current, cal_zero));
 				break;
 			case(OFF):
 			default:
@@ -92,6 +96,12 @@ void LoadRegulator::adjust_control_current(){
 			// only updates for positive resistance values
 			if(target_resistance > 0)
 				control_current += (measured_voltage/target_resistance - measured_current) * SET_LR_CUR_ERROR_SCALER;
+		case(CV):
+			// In constant voltage mode, increase control current by certain amount if voltage across load is too high; decrease otherwise
+			if(measured_voltage > target_voltage)
+				control_current += SET_LR_CV_CUR_STEP;
+			else
+				control_current -= SET_LR_CV_CUR_STEP;
 		default:
 			// Error case; do nothing
 			break;

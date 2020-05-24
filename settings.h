@@ -16,8 +16,12 @@
 #define SET_LR_CUR_ERROR_SCALER (0.5)
 // Zero current calibration amount
 #define SET_LR_CAL_AMOUNT (10)
-// Initial resistance
-#define SET_LR_INIT_RES (1000)
+// CR initial resistance
+#define SET_LR_INIT_RES (1000) // in ohms
+// CV current step size
+#define SET_LR_CV_CUR_STEP (0.001) // in mA
+// CV initial voltage
+#define SET_LR_CV_INIT_V (100) // in V
 
 /********************* Debugger *********************/
 // Define DEBUG as 1 to enable debugger

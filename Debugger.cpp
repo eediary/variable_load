@@ -45,15 +45,18 @@ void Debugger::run_debugger(){
 			Serial.send_string(" (", LR_control_current, 3, " A)");
 			break;
 		case(LoadRegulator::CV):
-			Serial.send_string("CV: nothing here yet");
+			Serial.send_string("CV");
+			Serial.send_string(", ", LR_measured_voltage, 3, " V");
+			Serial.send_string(" / ", LR_r.get_target_voltage(), 3, " V");
+			Serial.send_string(", ", LR_measured_current, 3, " A");
+			Serial.send_string(" (", LR_control_current, 3, " A)");
 			break;
 		case(LoadRegulator::OFF):
 			Serial.send_string("OFF");
 			Serial.send_string(", ", LR_measured_voltage, 3, "");
 			break;
 	}
-	Serial.send_string(", ", TR_r.get_temp_volt(), 3, " V");
-	Serial.send_string(", ", TR_r.get_duty_cycle(), "%\r\n");
+	Serial.send_string(" | ", TR_r.get_duty_cycle(), "%\r\n");
 	LED_G.off();
 	
 	// Check input
@@ -67,6 +70,9 @@ void Debugger::run_debugger(){
 		else if(char_buffer[0] == 'r')
 			// Put LR into constant resistance mode
 			LR_r.set_mode(LoadRegulator::CR);
+		else if(char_buffer[0] == 'v')
+			// Put LR into constant voltage mode
+			LR_r.set_mode(LoadRegulator::CV);
 		else if(char_buffer[0] == 'o')
 			// Put LR into OFF mode
 			LR_r.set_mode(LoadRegulator::OFF);
@@ -81,6 +87,9 @@ void Debugger::run_debugger(){
 					break;
 				case(LoadRegulator::CR):
 					LR_r.set_target_resistance(atof(char_buffer));
+					break;
+				case(LoadRegulator::CV):
+					LR_r.set_target_voltage(atof(char_buffer));
 					break;
 				default:
 					// do nothing
