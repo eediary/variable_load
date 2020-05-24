@@ -1,4 +1,5 @@
 #pragma once
+#include "schematic.h"
 
 /********************* MAIN *********************/
 #define SET_MAIN_TIMER_NUMBER (HAL_Timer::TIMER_TIMER3)
@@ -31,3 +32,8 @@
 
 /********************* Temp Regulator *********************/
 #define SET_TR_ADC_ADJ (HAL_ADC::ADC_RADJUST)
+#define SET_TR_TEMP_MIN (SCH_THERM_35C_VOLT)
+#define SET_TR_TEMP_MAX (SCH_THERM_85C_VOLT)
+#define SET_TR_DUTY_CYCLE_MIN (0)
+#define SET_TR_DUTY_CYCLE_MAX (100)
+#define SET_TR_VOLT_TO_DUTY_CYCLE(V) ((SET_TR_DUTY_CYCLE_MAX-SET_TR_DUTY_CYCLE_MIN)/(SET_TR_TEMP_MAX-SET_TR_TEMP_MIN)*(V-SET_TR_TEMP_MIN)+SET_TR_DUTY_CYCLE_MIN)
