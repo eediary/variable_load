@@ -9,10 +9,9 @@ TempRegulator::TempRegulator():
 
 void TempRegulator::regulate(){
 	temp_volt = SCH_TR_ADC_TO_VOLT(Adc.read(SCH_TR_ADC_TEMP_MUX));
-	cur_temp = SCH_TR_VOLT_TO_TEMP(temp_volt);
 	if(enable)
 		// duty cycle depends on temperature
-		duty_cycle = Pwm.set_duty_cycle(100/(SCH_TR_PWM_VOLT_MAX-SCH_TR_PWM_VOLT_MIN)*(temp_volt-SCH_TR_PWM_VOLT_MIN));
+		duty_cycle = Pwm.set_duty_cycle(SET_TR_VOLT_TO_DUTY_CYCLE(temp_volt));
 	else
 		// duty cycle is manually adjusted
 		duty_cycle = Pwm.set_duty_cycle(duty_cycle);

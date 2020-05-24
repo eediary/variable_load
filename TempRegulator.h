@@ -16,8 +16,7 @@ HAL_PWM Pwm;
 
 // Data
 bool enable;
-float temp_volt;
-float cur_temp;
+float temp_volt; // ADC reading of temp, in volts
 int duty_cycle; // duty cycle of PWM output
 
 public:
