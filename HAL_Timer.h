@@ -1,5 +1,6 @@
 #pragma once
 #include <avr/io.h>
+#include <avr/interrupt.h>
 /*
 Uses Timer/Counter 1 or 3 for timer
 Equation for frequency of interrupt occurrences is:
@@ -29,7 +30,15 @@ public:
 	enum Timer_op_mode{
 		TIMER_CTC_OCRNA = 0b0100
 	};
+	
+	// static public variables for ISR
+	static volatile unsigned long timer1_tick;
+	static volatile unsigned long timer3_tick;
+	static volatile bool timer1_flag;
+	static volatile bool timer3_flag;
+	
 private:
+	Timer_module mod_number;
 	volatile uint8_t *TCCRNA, *TCCRNB, *TCCRNC;
 	volatile uint16_t *TCNTN;
 	volatile uint16_t *OCRNA;
@@ -38,7 +47,10 @@ private:
 public:
 	// constructor
 	// constructor
-HAL_Timer(Timer_module mod_number, Timer_clk_sel clk_src, uint16_t top){
+HAL_Timer(Timer_module mod_num, Timer_clk_sel clk_src, uint16_t top){
+	// save mod number
+	mod_number = mod_num;
+	
 	// set up pointers
 	if(mod_number == TIMER_TIMER1){
 		TCCRNA = &TCCR1A;
@@ -60,6 +72,12 @@ HAL_Timer(Timer_module mod_number, Timer_clk_sel clk_src, uint16_t top){
 	// disable & reset counter
 	disable_timer();
 	clear_counter();
+	
+	// reset tick
+	reset_tick();
+	
+	// reset flags
+	clear_flag();
 	
 	// set top
 	set_top(top);
@@ -101,11 +119,37 @@ void enable_int(){
 void disable_int(){
 	*TIMSKN &= ~(0b1 << OCIE1A);
 }
-bool get_int_flag(){
-	return (*TIFRN & (0b1 << OCF1A));
+// tick
+void set_tick(unsigned long val){
+	if(mod_number == TIMER_TIMER1)
+		timer1_tick = val;
+	else //if(mod_number == TIMER_TIMER3)
+		timer3_tick = val;
 }
-void clear_int_flag(){
-	*TIFRN |= (0b1 << OCF1A);
+unsigned long get_tick(){
+	if(mod_number == TIMER_TIMER1)
+		return timer1_tick;
+	else //if(mod_number == TIMER_TIMER3)
+		return timer3_tick;
+}
+void reset_tick(){
+	if(mod_number == TIMER_TIMER1)
+		timer1_tick = 0;
+	else //if(mod_number == TIMER_TIMER3)
+		timer3_tick = 0;
+}
+// flags
+bool get_flag(){
+	if(mod_number == TIMER_TIMER1)
+		return timer1_flag;
+	else //if(mod_number == TIMER_TIMER3)
+		return timer3_flag;
+}
+void clear_flag(){
+	if(mod_number == TIMER_TIMER1)
+		timer1_flag = false;
+	else //if(mod_number == TIMER_TIMER3)
+		timer3_flag = false;
 }
 };
 
