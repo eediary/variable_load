@@ -104,3 +104,9 @@
 #define SCH_THERM_90C_VOLT (4.439)
 #define SCH_THERM_95C_VOLT (4.510)
 #define SCH_THERM_100C_VOLT (4.571)
+
+/********************* User Interface *********************/
+#define SCH_UI_A_PORT (HAL_GPIO::GPIO_PORTB)
+#define SCH_UI_A_PIN (HAL_GPIO::GPIO_PIN5)
+#define SCH_UI_B_PORT (HAL_GPIO::GPIO_PORTB)
+#define SCH_UI_B_PIN (HAL_GPIO::GPIO_PIN4)
