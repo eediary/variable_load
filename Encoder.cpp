@@ -4,14 +4,17 @@
 // Encoder static members are used to share data with ISR
 HAL_GPIO *Encoder::A_Ptr = NULL;
 HAL_GPIO *Encoder::B_Ptr = NULL;
+HAL_GPIO *Encoder::BTN_Ptr = NULL;
 volatile Encoder::Encoder_Gray Encoder::last_state = Encoder::ONE_ONE;
 volatile Encoder::Encoder_Dir Encoder::dir = Encoder::NONE;
+volatile bool Encoder::pressed = false;
 
 // ISR
 ISR(PCINT0_vect){
-	// Read A and B
+	// Read A, B and BTN
 	bool A_val = Encoder::A_Ptr->read_pin();
 	bool B_val = Encoder::B_Ptr->read_pin();
+	bool BTN_val = Encoder::BTN_Ptr->read_pin();	
 	
 	// Only update dir if transitioning away from idle state
 	if(Encoder::last_state == Encoder::ONE_ONE){
@@ -34,4 +37,8 @@ ISR(PCINT0_vect){
 		Encoder::last_state = Encoder::ONE_ZERO;
 	else if((A_val == true) && (B_val == true))
 		Encoder::last_state = Encoder::ONE_ONE;
+	
+	// UPdate is pressed
+	if(BTN_val == false)
+		Encoder::pressed = true;
 }
