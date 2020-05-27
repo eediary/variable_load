@@ -21,6 +21,7 @@ int main(void)
 {		
 	// Main Timer
 	HAL_Timer MainTimer = HAL_Timer(SET_MAIN_TIMER_NUMBER, SET_MAIN_TIMER_DIV, SET_MAIN_TIMER_TOP);
+	MainTimer.enable_int();
 	
 	// Load Regulator
 	LoadRegulator LoadRegulatorClass;
@@ -39,8 +40,8 @@ int main(void)
     {
 		LoadRegulatorClass.regulate();
 		
-		if(MainTimer.get_int_flag()){
-			MainTimer.clear_int_flag();
+		if(MainTimer.get_flag()){
+			MainTimer.clear_flag();
 			// Run regulator
 			TempRegulatorClass.regulate();
 			
