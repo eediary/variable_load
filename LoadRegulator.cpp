@@ -11,6 +11,9 @@ LoadRegulator::LoadRegulator():
 	current_control(LR_CUR_CONT_CS, LR_SPI, SCH_MAX5216_REF),
 	volt_monitor(LR_VMON_CS, LR_SPI)
 {
+	// Enable timer interrupt
+	LR_Timer.enable_int();
+	
 	// Configure voltage monitor ADC
 	volt_monitor.set_input_range(SCH_ADS8685_RANGE, SCH_ADS8685_REF);
 	
@@ -27,8 +30,8 @@ LoadRegulator::LoadRegulator():
 }
 void LoadRegulator::regulate(){
 	// Only run code if timer flag is set
-	if(LR_Timer.get_int_flag()){
-		LR_Timer.clear_int_flag();
+	if(LR_Timer.get_flag()){
+		LR_Timer.clear_flag();
 		
 		// Update measured current on valid read
 		float cur_mon_volt = 0;
