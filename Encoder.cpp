@@ -5,9 +5,12 @@
 HAL_GPIO *Encoder::A_Ptr = NULL;
 HAL_GPIO *Encoder::B_Ptr = NULL;
 HAL_GPIO *Encoder::BTN_Ptr = NULL;
+HAL_Timer *Encoder::Timer_Ptr = NULL;
 volatile Encoder::Encoder_Gray Encoder::last_state = Encoder::ONE_ONE;
 volatile Encoder::Encoder_Dir Encoder::dir = Encoder::NONE;
-volatile bool Encoder::pressed = false;
+volatile Encoder::Encoder_Button Encoder::pressed = Encoder::NO_PUSH;
+volatile unsigned long Encoder::button_time = 0;
+volatile bool Encoder::check_time = false;
 
 // ISR
 ISR(PCINT0_vect){
@@ -38,7 +41,16 @@ ISR(PCINT0_vect){
 	else if((A_val == true) && (B_val == true))
 		Encoder::last_state = Encoder::ONE_ONE;
 	
-	// UPdate is pressed
-	if(BTN_val == false)
-		Encoder::pressed = true;
+	// Check button
+	if(BTN_val == false){
+		// Falling edge
+		// Save time, enable check time
+		Encoder::check_time = true;
+		Encoder::button_time = Encoder::Timer_Ptr->get_tick();
+		Encoder::pressed = Encoder::PUSH;
+	}
+	else
+		// Rising edge
+		// Disable check time if button has been pressed
+		Encoder::check_time = false;
 }

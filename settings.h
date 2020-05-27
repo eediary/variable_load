@@ -41,3 +41,6 @@
 #define SET_TR_DUTY_CYCLE_MIN (0)
 #define SET_TR_DUTY_CYCLE_MAX (100)
 #define SET_TR_VOLT_TO_DUTY_CYCLE(V) ((SET_TR_DUTY_CYCLE_MAX-SET_TR_DUTY_CYCLE_MIN)/(SET_TR_TEMP_MAX-SET_TR_TEMP_MIN)*(V-SET_TR_TEMP_MIN)+SET_TR_DUTY_CYCLE_MIN)
+
+/********************* User Interface *********************/
+#define SET_UI_ENC_LONG_PRESS_THRESH (1000) // time necessary to be considered long press, in ms
