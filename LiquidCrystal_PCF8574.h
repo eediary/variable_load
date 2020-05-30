@@ -18,10 +18,8 @@
 /// * 30.05.2020 Modified by EE Diary to not use Arduino libraries
 #pragma once
 
-#include <inttypes.h>
-// #include "Print.h"
+#include "schematic.h"
 #include "PCF8574.h"
-#define F_CPU (16000000UL)
 #include <util/delay.h>
 
 // commands
