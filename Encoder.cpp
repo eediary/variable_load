@@ -19,14 +19,15 @@ ISR(PCINT0_vect){
 	bool B_val = Encoder::B_Ptr->read_pin();
 	bool BTN_val = Encoder::BTN_Ptr->read_pin();	
 	
-	// Only update dir if transitioning away from idle state
-	if(Encoder::last_state == Encoder::ONE_ONE){
-		// Encoder was idle; accept data
-		if(A_val == false){
-			// A = 0, B = 1
-			Encoder::dir = Encoder::CLOCKWISE;
-		}else if(B_val == false){
+	// Only update dir if transitioning away from all low
+	if(Encoder::last_state == Encoder::ZERO_ZERO){
+		// Encoder was all low; accept data
+		// Assumes A leads B
+		if(A_val == true){
 			// A = 1, B = 0
+			Encoder::dir = Encoder::CLOCKWISE;
+		}else if(B_val == true){
+			// A = 0, B = 1
 			Encoder::dir = Encoder::COUNTERCLOCKWISE;
 		}
 	}
