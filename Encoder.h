@@ -10,6 +10,10 @@
 
 class Encoder{
 public:
+	enum Encoder_Lead{
+		A_LEADS_B = 0,
+		B_LEADS_A = 1
+	};
 	enum Encoder_Dir{
 		NONE = 0,
 		CLOCKWISE = 1,
@@ -45,10 +49,11 @@ private:
 	HAL_GPIO &B;
 	HAL_GPIO &BTN;
 	HAL_Timer &Timer;
+	Encoder_Lead lead;
 	
 public:
-	Encoder(HAL_GPIO &A_r, HAL_GPIO &B_r, HAL_GPIO &BTN_r, HAL_Timer &Timer_r) :
-	A(A_r), B(B_r), BTN(BTN_r), Timer(Timer_r)
+	Encoder(HAL_GPIO &A_r, HAL_GPIO &B_r, HAL_GPIO &BTN_r, HAL_Timer &Timer_r, Encoder_Lead encoder_lead) :
+	A(A_r), B(B_r), BTN(BTN_r), Timer(Timer_r), lead(encoder_lead)
 	{
 		// Constructor
 		// Set up static public members
@@ -77,6 +82,14 @@ public:
 	Encoder_Dir get_dir(){
 		// reading dir clears it
 		Encoder_Dir to_return = dir;
+		// dir is written assuming A leads B
+		if(lead == B_LEADS_A){
+			// reverse direction
+			if(to_return == CLOCKWISE)
+				to_return = COUNTERCLOCKWISE;
+			else if(to_return == COUNTERCLOCKWISE)
+				to_return = CLOCKWISE;
+		}
 		dir = NONE;
 		return to_return;
 	}
