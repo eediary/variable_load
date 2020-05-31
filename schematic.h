@@ -106,6 +106,7 @@
 #define SCH_THERM_100C_VOLT (4.571)
 
 /********************* User Interface *********************/
+// Encoder
 #define SCH_UI_A_PORT (HAL_GPIO::GPIO_PORTB)
 #define SCH_UI_A_PIN (HAL_GPIO::GPIO_PIN5)
 #define SCH_UI_B_PORT (HAL_GPIO::GPIO_PORTB)
@@ -113,4 +114,8 @@
 #define SCH_UI_BTN_PORT (HAL_GPIO::GPIO_PORTB)
 #define SCH_UI_BTN_PIN (HAL_GPIO::GPIO_PIN0)
 #define SCH_UI_ENC_LEAD (Encoder::B_LEADS_A) // EN11-HSM1BF20
+
+// LCD
 #define SCH_UI_LCD_ADDR (PCF8574::ADDR_111)
+#define SCH_UI_LCD_COLS (20)
+#define SCH_UI_LCD_ROWS (4)

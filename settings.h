@@ -2,9 +2,10 @@
 #include "schematic.h"
 
 /********************* MAIN *********************/
-#define SET_MAIN_TIMER_NUMBER (HAL_Timer::TIMER_TIMER3)
-#define SET_MAIN_TIMER_DIV (HAL_Timer::TIMER_CLK_DIV1024)
-#define SET_MAIN_TIMER_TOP (15624)
+// Set to 1 ms
+#define SET_MAIN_TIMER_NUMBER (HAL_Timer::TIMER_TIMER1)
+#define SET_MAIN_TIMER_DIV (HAL_Timer::TIMER_CLK_DIV64)
+#define SET_MAIN_TIMER_TOP (249)
 
 /********************* LOAD REGULATOR *********************/
 // Load Regulator sampling frequency
@@ -43,4 +44,9 @@
 #define SET_TR_VOLT_TO_DUTY_CYCLE(V) ((SET_TR_DUTY_CYCLE_MAX-SET_TR_DUTY_CYCLE_MIN)/(SET_TR_TEMP_MAX-SET_TR_TEMP_MIN)*(V-SET_TR_TEMP_MIN)+SET_TR_DUTY_CYCLE_MIN)
 
 /********************* User Interface *********************/
+// Encoder
 #define SET_UI_ENC_LONG_PRESS_THRESH (1000) // time necessary to be considered long press, in ms
+// LCD
+#define SET_UI_LCD_UPDATE_PERIOD (100) // time between full screen updates, in ms
+// Screen
+#define SET_UI_SCREEN_MAX_LINES (8)
