@@ -134,7 +134,7 @@ void LiquidCrystal_PCF8574::print(char *str){
 		write(*(str++));
 }
 
-inline void LiquidCrystal_PCF8574::print(char c){
+void LiquidCrystal_PCF8574::print(char c){
 	// Sends single character
 	write(c);
 }
