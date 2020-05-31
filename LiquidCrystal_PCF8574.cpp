@@ -134,6 +134,11 @@ void LiquidCrystal_PCF8574::print(char *str){
 		write(*(str++));
 }
 
+inline void LiquidCrystal_PCF8574::print(char c){
+	// Sends single character
+	write(c);
+}
+
 
 /// Set the cursor to a new position. 
 void LiquidCrystal_PCF8574::setCursor(uint8_t col, uint8_t row)

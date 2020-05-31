@@ -91,6 +91,7 @@ public:
   void createChar(uint8_t, uint8_t[]);
   void setCursor(uint8_t col, uint8_t row); 
   void print(char *str);
+  void print(char c);
 
 void _send(uint8_t value, uint8_t mode);
 
