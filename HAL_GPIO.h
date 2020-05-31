@@ -39,40 +39,40 @@ public:
 		int_type = GPIO_NONE;
 		switch(port){
 			case GPIO_PORTB:
-			gpio_PORT_r = &PORTB;
-			gpio_DDR_r = &DDRB;
-			gpio_PIN_r = &PINB;
-			int_type = GPIO_PCINT;
-			break;
+				gpio_PORT_r = &PORTB;
+				gpio_DDR_r = &DDRB;
+				gpio_PIN_r = &PINB;
+				int_type = GPIO_PCINT;
+				break;
 			case GPIO_PORTC:
-			gpio_PORT_r = &PORTC;
-			gpio_DDR_r = &DDRC;
-			gpio_PIN_r = &PINC;
-			break;
+				gpio_PORT_r = &PORTC;
+				gpio_DDR_r = &DDRC;
+				gpio_PIN_r = &PINC;
+				break;
 			case GPIO_PORTD:
-			gpio_PORT_r = &PORTD;
-			gpio_DDR_r = &DDRD;
-			gpio_PIN_r = &PIND;
-			if(pin < GPIO_PIN4)
-			int_type = GPIO_EXTINT;
-			break;
+				gpio_PORT_r = &PORTD;
+				gpio_DDR_r = &DDRD;
+				gpio_PIN_r = &PIND;
+				if(pin < GPIO_PIN4)
+				int_type = GPIO_EXTINT;
+				break;
 			case GPIO_PORTE:
-			gpio_PORT_r = &PORTE;
-			gpio_DDR_r = &DDRE;
-			gpio_PIN_r = &PINE;
-			if(pin == GPIO_PIN6)
-			int_type = GPIO_EXTINT6;
-			break;
+				gpio_PORT_r = &PORTE;
+				gpio_DDR_r = &DDRE;
+				gpio_PIN_r = &PINE;
+				if(pin == GPIO_PIN6)
+					int_type = GPIO_EXTINT6;
+				break;
 			case GPIO_PORTF:
-			gpio_PORT_r = &PORTF;
-			gpio_DDR_r = &DDRF;
-			gpio_PIN_r = &PINF;
-			break;
+				gpio_PORT_r = &PORTF;
+				gpio_DDR_r = &DDRF;
+				gpio_PIN_r = &PINF;
+				break;
 		}
 		// Set up pin direction and initial value
 		if(val){
 			set_pin();
-			} else{
+		} else{
 			clear_pin();
 		}
 		set_direction(dir);
@@ -96,6 +96,13 @@ public:
 	void toggle_pin(){
 		*gpio_PORT_r ^= gpio_pin_m;
 	}
+	void write_pin(bool val){
+		// Sets pin high if val is true, low otherwise
+		if(val)
+			set_pin();
+		else
+			clear_pin();
+	}
 	bool read_pin(){
 		return (bool)(*gpio_PIN_r & gpio_pin_m);
 	}
@@ -113,41 +120,41 @@ public:
 	bool is_pullup(){
 		return (bool)(!(MCUCR & (1 << PUD)));
 	}
-	int gpio_interrupt_enable(){
+	int int_mask_enable(){
 		// enables interrupt for pin
 		// enables external interrupt or pin change interrupt
 		// if pin can't generate interrupt, returns -1
 		switch(int_type){
 			case(GPIO_NONE):
-			return -1;
+				return -1;
 			case(GPIO_PCINT):
-			PCMSK0 |= gpio_pin_m;
-			return 1;
+				PCMSK0 |= gpio_pin_m;
+				return 1;
 			case(GPIO_EXTINT):
 			case(GPIO_EXTINT6):
-			EIMSK |= gpio_pin_m;
-			return 2;
+				EIMSK |= gpio_pin_m;
+				return 2;
 		}
 		return 0; // should not reach here
 	}
-	int gpio_interrupt_disable(){
+	int int_mask_disable(){
 		// disables interrupt for pin
 		// disables external interrupt or pin change interrupt
 		// if pin can't generate interrupt, returns -1
 		switch(int_type){
 			case(GPIO_NONE):
-			return -1;
+				return -1;
 			case(GPIO_PCINT):
-			PCMSK0 &= ~gpio_pin_m;
-			return 1;
+				PCMSK0 &= ~gpio_pin_m;
+				return 1;
 			case(GPIO_EXTINT):
 			case(GPIO_EXTINT6):
-			EIMSK &= ~gpio_pin_m;
-			return 2;
+				EIMSK &= ~gpio_pin_m;
+				return 2;
 		}
 		return 0; // should not reach here
 	}
-	int gpio_extint_config(GPIO_INT_TRIG setting){
+	int extint_config(GPIO_INT_TRIG setting){
 		// configures external interrupt trigger for pin
 		// trigger can be rising edge, falling edge, edge or low
 		// if pin is not external interrupt pin, returns 1
@@ -161,5 +168,14 @@ public:
 			return 0;
 		}
 		return 1;
+	}
+	void pin_change_int_enable(){
+		// Enables pin change interrupt
+		// Mask & enable must be set to trigger ISR
+		PCICR |= (0b1 << PCIE0);
+	}
+	void pin_change_int_disable(){
+		// Disables pin change interrupt
+		PCICR &= ~(0b1 << PCIE0);
 	}
 };
