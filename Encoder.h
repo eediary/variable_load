@@ -45,15 +45,19 @@ public:
 	static volatile bool check_time;
 
 private:	
-	HAL_GPIO &A;
-	HAL_GPIO &B;
-	HAL_GPIO &BTN;
+	HAL_GPIO A;
+	HAL_GPIO B;
+	HAL_GPIO BTN;
 	HAL_Timer &Timer;
 	Encoder_Lead lead;
 	
 public:
-	Encoder(HAL_GPIO &A_r, HAL_GPIO &B_r, HAL_GPIO &BTN_r, HAL_Timer &Timer_r, Encoder_Lead encoder_lead) :
-	A(A_r), B(B_r), BTN(BTN_r), Timer(Timer_r), lead(encoder_lead)
+	Encoder(
+		HAL_GPIO::GPIO_port A_port, HAL_GPIO::GPIO_pin A_pin, 
+		HAL_GPIO::GPIO_port B_port, HAL_GPIO::GPIO_pin B_pin,
+		HAL_GPIO::GPIO_port BTN_port, HAL_GPIO::GPIO_pin BTN_pin,
+		HAL_Timer &Timer_r, Encoder_Lead encoder_lead) :
+		A(A_port, A_pin), B(B_port, B_pin), BTN(BTN_port, BTN_pin), Timer(Timer_r), lead(encoder_lead)
 	{
 		// Constructor
 		// Set up static public members
@@ -71,9 +75,10 @@ public:
 		A.set_direction(HAL_GPIO::GPIO_INPUT);
 		B.set_direction(HAL_GPIO::GPIO_INPUT);
 		BTN.set_direction(HAL_GPIO::GPIO_INPUT);
-		A.gpio_interrupt_enable();
-		B.gpio_interrupt_enable();
-		BTN.gpio_interrupt_enable();
+		A.int_mask_enable();
+		B.int_mask_enable();
+		BTN.int_mask_enable();
+		BTN.pin_change_int_enable();
 		
 		// Configure Timer
 		Timer.enable_int();
