@@ -23,6 +23,8 @@
 #define SET_LR_CV_CUR_STEP (0.001) // in mA
 // CV initial voltage
 #define SET_LR_CV_INIT_V (100) // in V
+// Current sampling period
+#define SET_LR_CUR_SAMPLE_PERIOD (17) // in ms
 
 /********************* Debugger *********************/
 // Define DEBUG as 1 to enable debugger
@@ -47,6 +49,6 @@
 // Encoder
 #define SET_UI_ENC_LONG_PRESS_THRESH (1000) // time necessary to be considered long press, in ms
 // LCD
-#define SET_UI_LCD_UPDATE_PERIOD (100) // time between full screen updates, in ms
+#define SET_UI_LCD_UPDATE_PERIOD (200) // time between full screen updates, in ms
 // Screen
 #define SET_UI_SCREEN_MAX_LINES (8)
