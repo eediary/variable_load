@@ -5,12 +5,14 @@
 // HAL headers
 #include "HAL_ADC.h"
 #include "HAL_PWM.h"
+#include "HAL_Timer.h"
 
 class TempRegulator{
 public:
 
 private:
 // HAL classes
+HAL_Timer &Timer;
 HAL_ADC Adc;
 HAL_PWM Pwm;
 
@@ -18,9 +20,10 @@ HAL_PWM Pwm;
 bool enable;
 float temp_volt; // ADC reading of temp, in volts
 int duty_cycle; // duty cycle of PWM output
+unsigned long last_time; // last time run, in ms
 
 public:
-TempRegulator();
+TempRegulator(HAL_Timer &Timer_r);
 void regulate();
 // enable or disable regulator
 void enable_regulation(){
