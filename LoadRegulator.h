@@ -39,6 +39,8 @@ float target_voltage; // desired voltage across load, in volts
 float measured_current; // current going through load, in amps
 float control_current; // controlled variable adjusted to get target current, in amps
 float measured_voltage; // in volts
+// misc
+unsigned long last_cur_time; // last time current was measured; in ms
 operation_mode op_mode;
 
 public:

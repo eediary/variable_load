@@ -23,6 +23,7 @@ LoadRegulator::LoadRegulator():
 	
 	// Puts load regulator into innocuous state
 	// Calibrates zero
+	last_cur_time = 0;
 	set_mode(OFF);
 	regulate();
 	set_target_current(0);
@@ -33,12 +34,16 @@ void LoadRegulator::regulate(){
 	if(LR_Timer.get_flag()){
 		LR_Timer.clear_flag();
 		
-		// Update measured current on valid read
-		float cur_mon_volt = 0;
-		HAL_TWI::TWI_ERROR error = current_monitor.read(cur_mon_volt);
-		if(error == HAL_TWI::TWI_NO_ERROR){
-			// Only update measured current on valid read
-			measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
+		// Update measured current if enough time has passed
+		HAL_TWI::TWI_ERROR error = HAL_TWI::TWI_MISC;
+		if(LR_Timer.get_tick() - last_cur_time > SET_LR_CUR_SAMPLE_PERIOD){
+			last_cur_time = LR_Timer.get_tick();
+			float cur_mon_volt = 0;
+			error = current_monitor.read(cur_mon_volt);
+			if(error == HAL_TWI::TWI_NO_ERROR){
+				// Only update measured current on valid read
+				measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
+			}
 		}
 		
 		// Update measured voltage
