@@ -29,6 +29,8 @@
 /********************* Debugger *********************/
 // Define DEBUG as 1 to enable debugger
 #define DEBUG 1
+// Debugger output period
+#define SET_DEBUGGER_PERIOD (1000) // in ms
 // UART settings
 #define SET_UART_DATA_BITS (HAL_UART::UART_8_BITS)
 #define SET_UART_PARITY (HAL_UART::UART_PARITY_NONE)
@@ -38,6 +40,8 @@
 #define SET_DEBUGGER_BAUD (57600)
 
 /********************* Temp Regulator *********************/
+// Temp regulator period
+#define SET_TR_PERIOD (100) // in ms
 #define SET_TR_ADC_ADJ (HAL_ADC::ADC_RADJUST)
 #define SET_TR_TEMP_MIN (SCH_THERM_35C_VOLT)
 #define SET_TR_TEMP_MAX (SCH_THERM_85C_VOLT)

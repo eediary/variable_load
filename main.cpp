@@ -27,11 +27,11 @@ int main(void)
 	LoadRegulator LoadRegulatorClass;
 	
 	// Temperature Regulator
-	TempRegulator TempRegulatorClass;
+	TempRegulator TempRegulatorClass(MainTimer);
 	
 	// Debugger
 	#if DEBUG == 1
-	Debugger DebuggerModule = Debugger(SET_DEBUGGER_BAUD, LoadRegulatorClass, TempRegulatorClass);
+	Debugger DebuggerModule = Debugger(SET_DEBUGGER_BAUD, LoadRegulatorClass, TempRegulatorClass, MainTimer);
 	#endif
 	
 	// Enable global interrupt
@@ -40,16 +40,13 @@ int main(void)
     {
 		LoadRegulatorClass.regulate();
 		
-		if(MainTimer.get_flag()){
-			MainTimer.clear_flag();
-			// Run regulator
-			TempRegulatorClass.regulate();
-			
-			// Debugger
-			#if DEBUG == 1
-			DebuggerModule.run_debugger();
-			#endif
-		}
+		// Run temp regulator
+		TempRegulatorClass.regulate();
+		
+		// Debugger
+		#if DEBUG == 1
+		DebuggerModule.run_debugger();
+		#endif
 		
     }
 }
