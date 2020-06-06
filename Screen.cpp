@@ -57,35 +57,110 @@ int Screen::get_cursor(){
 	return cursor_row;
 }
 
-/********************* Main screen *********************/
-Main_Screen::Main_Screen(){
+/********************* VL screen *********************/
+VL_Screen::VL_Screen(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r): 
+	_LR_state(LR_state_r),
+	_TR_state(TR_state_r)
+{
+	// Initialize data
+	row_offset = 0;
+	cursor_row = 0;
+	cursor_row_min = 0;
+	show_cursor = false;
+	number_of_rows = VL_SIZE;
+	
+	strcpy(text[0], "00.00 V\n");
+	strcpy(text[1], "00.00 A\n");
+	strcpy(text[2], "000.00 W\n");
+	strcpy(text[3], "OFF             000%");
+	
+}
+void VL_Screen::update_text(){
+	// Update voltage, current, power, mode of variable load
+	// Update Duty cycle of fan
+	// Update measured voltage
+	dtostrf(_LR_state._measured_voltage, SET_UI_MEASURED_VOLT_WIDTH, SET_UI_MEASURED_VOLT_DECIMAL, text[0]);
+	strcat(text[0], " V\n");
+	// Update measured current
+	dtostrf(_LR_state._measured_current, SET_UI_MEASURED_CURR_WIDTH, SET_UI_MEASURED_CURR_DECIMAL, text[1]);
+	strcat(text[1], " A\n");
+	// Update measured power
+	float measured_power = _LR_state._measured_voltage * _LR_state._measured_current;
+	dtostrf(measured_power, SET_UI_MEASURED_POW_WIDTH, SET_UI_MEASURED_POW_DECIMAL, text[2]);
+	strcat(text[2], " W\n");
+	// Update mode
+	switch(_LR_state._op_mode){
+		case(LoadRegulator::CC):
+			strcpy(text[3], "CC ");
+			break;
+		case(LoadRegulator::CP):
+			strcpy(text[3], "CP ");
+			break;
+		case(LoadRegulator::CR):
+			strcpy(text[3], "CR ");
+			break;
+		case(LoadRegulator::CV):
+			strcpy(text[3], "CV ");
+			break;
+		case(LoadRegulator::OFF):
+			strcpy(text[3], "OFF");
+			break;
+	}
+	// Update duty cycle
+	strcat(text[3], "            ");
+	itoa(_TR_state._duty_cycle, text[3]+15, 10);
+	strcat(text[3], "%\n");
+}
+Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	// Push toggle output enable
+	if(btn == Encoder::PUSH){
+		// Toggle output enable, don't change screen
+		return Screen::VL_SCREEN;
+	}
+	
+	// Long push enters main menu
+	if(btn == Encoder::LONG_PUSH){
+		// Go to Main menu
+		return Screen::MAIN_MENU_SCREEN;
+	}
+	
+	// If no input, remain on current screen
+	return Screen::VL_SCREEN;
+}
+/********************* Main Menu screen *********************/
+Main_Menu_Screen::Main_Menu_Screen(){
 	// Initialize data
 	row_offset = 0;
 	cursor_row = 1;
 	cursor_row_min = 1;
 	show_cursor = true;
-	number_of_rows = MAIN_SIZE;
+	number_of_rows = MAIN_MENU_SIZE;
 	
 	strcpy(text[0], "Main menu\n");
-	strcpy(text[1], " Line 1\n");
-	strcpy(text[2], " Line 2\n");
-	strcpy(text[3], " Line 3\n");
-	strcpy(text[4], " Line 4\n");
-	strcpy(text[5], " Line 5\n");
-	strcpy(text[6], " Line 6\n");
-	strcpy(text[7], " Line 7\n");
+	strcpy(text[1], " Set mode\n");
+	strcpy(text[2], " Set target\n");
+	strcpy(text[3], " Debugger\n");
+	strcpy(text[4], " Fan Control\n");
+	strcpy(text[5], " Info\n");
 	
 }
-void Main_Screen::update_text(){
-	// No need to update
+void Main_Menu_Screen::update_text(){
+	// No need to update text
 }
-Screen::SCREEN_ID Main_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
-	// button resets cursor row
+Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	// Push to go to submenu
 	if(btn == Encoder::PUSH){
-		if(get_cursor() == 1)
-			return Screen::MENU_SCREEN;
-		else if(get_cursor() == 2)
-			return Screen::TEST_SCREEN;
+		// Change screen; WIP
+// 		if(get_cursor() == 1)
+// 			return Screen::MENU_SCREEN;
+// 		else if(get_cursor() == 2)
+// 			return Screen::TEST_SCREEN;
+	}
+	
+	// Long push returns to VL screen
+	if(btn == Encoder::LONG_PUSH){
+		// Go to VL Screen
+		return Screen::VL_SCREEN;
 	}
 	
 	// dir increments or decrements cursor row
@@ -95,45 +170,5 @@ Screen::SCREEN_ID Main_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::E
 		decrement_cursor();
 	
 	// don't change screens
-	return Screen::MAIN_SCREEN;
+	return Screen::MAIN_MENU_SCREEN;
 }
-
-// /********************* Menu screen *********************/
-// Menu_Screen::Menu_Screen(){
-// 	show_cursor = true;
-// 	number_of_rows = MENU_SIZE;
-// 	strcpy(text[0], " welcome            ");
-// 	strcpy(text[1], " to the             ");
-// 	strcpy(text[2], " menu screen        ");
-// 	strcpy(text[3], " not much           ");
-// 	strcpy(text[4], " to see right?      ");
-// }
-// Screen::SCREEN_ID Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
-// 	// button resets cursor row
-// 	if(btn == Encoder::LONG_PUSH)
-// 		return Screen::MAIN_SCREEN;
-// 				
-// 	// dir increments or decrements cursor row
-// 	if(dir == Encoder::CLOCKWISE)
-// 		increment_cursor();
-// 	else if(dir == Encoder::COUNTERCLOCKWISE)
-// 		decrement_cursor();
-// 	
-// 	// don't change screens
-// 	return Screen::MENU_SCREEN;
-// }
-// 
-// /********************* Test screen *********************/
-// Test_Screen::Test_Screen(){
-// 	show_cursor = false;
-// 	number_of_rows = TEST_SIZE;
-// 	strcpy(text[0], "test screen         ");
-// }
-// Screen::SCREEN_ID Test_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
-// 	// button resets cursor row
-// 	if(btn == Encoder::LONG_PUSH)
-// 		return Screen::MAIN_SCREEN;
-// 	
-// 	// don't change screens
-// 	return Screen::TEST_SCREEN;
-// }

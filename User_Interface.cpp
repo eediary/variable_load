@@ -1,9 +1,13 @@
 #include "User_Interface.h"
 
-User_Interface::User_Interface(HAL_Timer &Timer_r): 
+User_Interface::User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r, HAL_Timer &Timer_r): 
+	_LR_state(LR_state_r),
+	_TR_state(TR_state_r),
 	Timer(Timer_r),
 	Enc(SCH_UI_A_PORT, SCH_UI_A_PIN, SCH_UI_B_PORT, SCH_UI_B_PIN, SCH_UI_BTN_PORT, SCH_UI_BTN_PIN, Timer, SCH_UI_ENC_LEAD),
-	Lcd(SCH_UI_LCD_ADDR)
+	Lcd(SCH_UI_LCD_ADDR),
+	VL_screen(_LR_state, _TR_state),
+	Main_menu_screen()
 {
 	// Initialize variables
 	cur_row = 0;
@@ -11,7 +15,7 @@ User_Interface::User_Interface(HAL_Timer &Timer_r):
 	last_update = Timer.get_tick();
 	wait_for_clear_flag = false;
 	print_flag = false;
-	cur_screen = &Main_screen;
+	cur_screen = &VL_screen;
 	
 	// Set up LCD
 	Lcd.begin(SCH_UI_LCD_COLS, SCH_UI_LCD_ROWS);
@@ -74,16 +78,12 @@ void User_Interface::update_screen(){
 	}
 	
 	// Pass input to screen; update screen pointer
-	cur_screen->handle_input(dir, press);
-// 	switch(cur_screen->handle_input(Enc.get_dir(), Enc.get_pressed())){
-// 		case(Screen::MAIN_SCREEN):
-// 			cur_screen = &Main_screen;
-// 			break;
-// 		case(Screen::MENU_SCREEN):
-// 			cur_screen = &Menu_screen;
-// 			break;
-// 		case(Screen::TEST_SCREEN):
-// 			cur_screen = &Test_screen;
-// 			break;
-// 	}
+	switch(cur_screen->handle_input(dir, press)){
+		case(Screen::VL_SCREEN):
+			cur_screen = &VL_screen;
+			break;
+		case(Screen::MAIN_MENU_SCREEN):
+			cur_screen = &Main_menu_screen;
+			break;
+	}
 }

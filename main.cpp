@@ -16,6 +16,7 @@
 #include "LoadRegulator.h"
 #include "TempRegulator.h"
 #include "Debugger.h"
+#include "User_Interface.h"
 
 int main(void)
 {		
@@ -24,31 +25,39 @@ int main(void)
 	MainTimer.enable_int();
 	
 	// Load Regulator constructor
-	LoadRegulator LoadRegulatorClass;
+	LoadRegulator LoadReg;
 	
 	// Temperature Regulator constructor
-	TempRegulator TempRegulatorClass(MainTimer);
-	
-	// Debugger constructor
-	#if DEBUG == 1
-	Debugger DebuggerModule = Debugger(LoadRegulatorClass, TempRegulatorClass, MainTimer);
-	#endif
+	TempRegulator TempReg(MainTimer);
 	
 	// state variable
 	LoadRegulator::LR_state LR_state_var;
-	LoadRegulatorClass.get_state(LR_state_var);
+	LoadReg.get_state(LR_state_var);
 	TempRegulator::TR_state TR_state_var;
-	TempRegulatorClass.get_state(TR_state_var);
+	TempReg.get_state(TR_state_var);
+	
+	// User Interface constructor
+	User_Interface UI(LR_state_var, TR_state_var, MainTimer);
+	
+	// Debugger constructor
+	#if DEBUG == 1
+	Debugger DebuggerModule = Debugger(LoadReg, TempReg, MainTimer);
+	#endif
 	
 	// Enable global interrupt
 	sei();
     while (1) 
     {
-		// Run load regulator
-		LoadRegulatorClass.regulate();
+		// Run load regulator and update state
+		LoadReg.regulate();
+		LoadReg.get_state(LR_state_var);
 		
-		// Run temp regulator
-		TempRegulatorClass.regulate();
+		// Run temp regulator and update state
+		TempReg.regulate();
+		TempReg.get_state(TR_state_var);
+		
+		// Run user interface
+		UI.update_screen();
 		
 		// Run debugger
 		#if DEBUG == 1

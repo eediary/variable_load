@@ -8,23 +8,24 @@
 // Standard libraries
 #include <stdlib.h>
 #include <string.h>
+// Module headers
+#include "LoadRegulator.h"
+#include "TempRegulator.h"
 
 // Special characters & lines
 #define BLANK_LINE "                    "
 #define CURSOR_ICON (0x7E)
 
 // Screen sizes
-#define MAIN_SIZE (8)
-#define MENU_SIZE (5)
-#define TEST_SIZE (1)
+#define VL_SIZE (4)
+#define MAIN_MENU_SIZE (6)
 
 /********************* Screen class *********************/
 class Screen{
 public:
 	enum SCREEN_ID{
-		MAIN_SCREEN = 0,
-		MENU_SCREEN = 1,
-		TEST_SCREEN = 2
+		VL_SCREEN,
+		MAIN_MENU_SCREEN
 	};
 protected:
 	int row_offset;
@@ -47,25 +48,22 @@ public:
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 
-/********************* Main screen *********************/
-class Main_Screen : public Screen{
+/********************* VL screen *********************/
+class VL_Screen : public Screen{
+	private:
+		virtual void update_text();
+		LoadRegulator::LR_state &_LR_state;
+		TempRegulator::TR_state &_TR_state;
+	public:
+		VL_Screen(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r);
+		virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
+};
+
+/********************* Main Menu screen *********************/
+class Main_Menu_Screen : public Screen{
 private:
 	virtual void update_text();
 public:
-	Main_Screen();
+	Main_Menu_Screen();
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
-
-// /********************* Menu screen *********************/
-// class Menu_Screen : public Screen{
-// public:
-// 	Menu_Screen();
-// 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
-// };
-// 
-// /********************* Test screen *********************/
-// class Test_Screen : public Screen{
-// 	public:
-// 	Test_Screen();
-// 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
-// };
