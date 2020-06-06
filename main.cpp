@@ -19,31 +19,38 @@
 
 int main(void)
 {		
-	// Main Timer
+	// Main Timer constructor
 	HAL_Timer MainTimer = HAL_Timer(SET_MAIN_TIMER_NUMBER, SET_MAIN_TIMER_DIV, SET_MAIN_TIMER_TOP);
 	MainTimer.enable_int();
 	
-	// Load Regulator
+	// Load Regulator constructor
 	LoadRegulator LoadRegulatorClass;
 	
-	// Temperature Regulator
+	// Temperature Regulator constructor
 	TempRegulator TempRegulatorClass(MainTimer);
 	
-	// Debugger
+	// Debugger constructor
 	#if DEBUG == 1
-	Debugger DebuggerModule = Debugger(SET_DEBUGGER_BAUD, LoadRegulatorClass, TempRegulatorClass, MainTimer);
+	Debugger DebuggerModule = Debugger(LoadRegulatorClass, TempRegulatorClass, MainTimer);
 	#endif
+	
+	// state variable
+	LoadRegulator::LR_state LR_state_var;
+	LoadRegulatorClass.get_state(LR_state_var);
+	TempRegulator::TR_state TR_state_var;
+	TempRegulatorClass.get_state(TR_state_var);
 	
 	// Enable global interrupt
 	sei();
     while (1) 
     {
+		// Run load regulator
 		LoadRegulatorClass.regulate();
 		
 		// Run temp regulator
 		TempRegulatorClass.regulate();
 		
-		// Debugger
+		// Run debugger
 		#if DEBUG == 1
 		DebuggerModule.run_debugger();
 		#endif
