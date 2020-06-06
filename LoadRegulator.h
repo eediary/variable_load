@@ -19,6 +19,21 @@ enum operation_mode{
 	CC, CP, CR, CV, OFF
 };
 
+struct LR_state 
+{
+	// Read / write
+	operation_mode _op_mode;
+	float _target_current;
+	float _target_power;
+	float _target_resistance;
+	float _target_voltage;
+	
+	// Read only
+	float _measured_current;
+	float _measured_voltage;
+	float _control_current;
+};
+
 private:
 // HAL classes
 HAL_Timer LR_Timer;
@@ -106,5 +121,28 @@ void set_target_voltage(float val){
 float get_target_voltage(){
 	return target_voltage;
 }
-
+// Set / get state
+void get_state(LR_state &state){
+	// Updates members of provided struct
+	// Allows quick extraction of info
+	state._op_mode = op_mode;
+	state._target_current = target_current;
+	state._target_power = target_power;
+	state._target_resistance = target_resistance;
+	state._target_voltage = target_voltage;
+	state._measured_current = measured_current;
+	state._measured_voltage = measured_voltage;
+	state._control_current = control_current;
+}
+void set_state(LR_state &state){
+	// Only uses writable members
+	// Allows quick configuration of instance
+	op_mode = state._op_mode;
+	target_current = state._target_current;
+	target_power = state._target_power;
+	target_resistance = state._target_resistance;
+	target_voltage = state._target_voltage;
+	
+	// Does not update measured_current, measured_voltage or control_cur
+}
 };

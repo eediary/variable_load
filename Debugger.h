@@ -30,6 +30,6 @@ LED LED_R;
 unsigned long last_time; // last time called, in ms
 
 public:
-Debugger(long baud_rate, LoadRegulator &LoadRegulator_r, TempRegulator &TempRegulator_r, HAL_Timer &Timer_r);
+Debugger(LoadRegulator &LoadRegulator_r, TempRegulator &TempRegulator_r, HAL_Timer &Timer_r);
 void run_debugger();
 };
