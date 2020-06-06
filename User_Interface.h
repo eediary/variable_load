@@ -9,9 +9,15 @@
 #include "LiquidCrystal_PCF8574.h"
 // Software headers
 #include "Screen.h"
+// Module headers
+#include "LoadRegulator.h"
+#include "TempRegulator.h"
 
 class User_Interface{
 private:
+// State members
+LoadRegulator::LR_state &_LR_state;
+TempRegulator::TR_state &_TR_state;
 // Class members
 HAL_Timer &Timer;
 Encoder Enc;
@@ -28,6 +34,6 @@ Screen *cur_screen; // pointer to current screen
 char screen_chars[SCH_UI_LCD_ROWS][SCH_UI_LCD_COLS+1]; // characters to print
 
 public:
-User_Interface(HAL_Timer &Timer_r);
+User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r, HAL_Timer &Timer_r);
 void update_screen();
 };

@@ -1,6 +1,8 @@
 #include "User_Interface.h"
 
-User_Interface::User_Interface(HAL_Timer &Timer_r): 
+User_Interface::User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r, HAL_Timer &Timer_r): 
+	_LR_state(LR_state_r),
+	_TR_state(TR_state_r),
 	Timer(Timer_r),
 	Enc(SCH_UI_A_PORT, SCH_UI_A_PIN, SCH_UI_B_PORT, SCH_UI_B_PIN, SCH_UI_BTN_PORT, SCH_UI_BTN_PIN, Timer, SCH_UI_ENC_LEAD),
 	Lcd(SCH_UI_LCD_ADDR)
