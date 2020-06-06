@@ -53,6 +53,7 @@
 // Encoder
 #define SET_UI_ENC_LONG_PRESS_THRESH (1000) // time necessary to be considered long press, in ms
 // LCD
-#define SET_UI_LCD_UPDATE_PERIOD (200) // time between full screen updates, in ms
+#define SET_UI_LCD_UPDATE_PERIOD (1000) // time between full screen updates, in ms
+#define SET_UI_LCD_CLEAR_PERIOD (2) // time in ms
 // Screen
 #define SET_UI_SCREEN_MAX_LINES (8)
