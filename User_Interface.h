@@ -17,13 +17,15 @@ HAL_Timer &Timer;
 Encoder Enc;
 LiquidCrystal_PCF8574 Lcd;
 Main_Screen Main_screen;
-Menu_Screen Menu_screen;
-Test_Screen Test_screen;
+// Menu_Screen Menu_screen;
+// Test_Screen Test_screen;
 // Data members
 int cur_col, cur_row; // col and row to print
 long last_update; // last time screen was updated
+bool wait_for_clear_flag;
 bool print_flag; // flag to print
-Screen *cur_screen;
+Screen *cur_screen; // pointer to current screen
+char screen_chars[SCH_UI_LCD_ROWS][SCH_UI_LCD_COLS+1]; // characters to print
 
 public:
 User_Interface(HAL_Timer &Timer_r);

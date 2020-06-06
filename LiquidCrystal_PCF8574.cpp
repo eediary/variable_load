@@ -122,6 +122,11 @@ void LiquidCrystal_PCF8574::clear()
   _delay_us(2000);  // this command takes a long time!
 }
 
+void LiquidCrystal_PCF8574::clear_no_delay()
+{
+	_command(LCD_CLEARDISPLAY);  // clear display, set cursor position to zero
+}
+
 void LiquidCrystal_PCF8574::home()
 {
   _command(LCD_RETURNHOME);  // set cursor position to zero

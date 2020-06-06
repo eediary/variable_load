@@ -1,24 +1,27 @@
 #include "Screen.h"
 /********************* Screen class *********************/
 Screen::Screen(){
-	row_offset = 0;
-	cursor_row = 0;
-	show_cursor = false;
-	// number_of_rows = SET_UI_SCREEN_MAX_LINES; // undefined reference to vtable?
+	// Initialize in derived classes
 }
-char Screen::get_char(int col, int row){
-	int new_row = row + row_offset;
-	// if input is invalid, return blank
-	if((new_row >= number_of_rows) || (new_row < 0) || (col >= SCH_UI_LCD_COLS) || (col < 0))
-		return ' ';
-	else{
-		// show cursor if relevant
-		if(show_cursor && (col == 0) && (new_row == cursor_row))
-			// return cursor
-			return CURSOR_ICON;
-		else
-			// return character
-			return text[new_row][col];
+void Screen::update_screen_chars(char screen_chars[SCH_UI_LCD_ROWS][SCH_UI_LCD_COLS+1]){
+	// Update text
+	update_text();
+	
+	// Load text to screen_chars
+	for(int i = 0; i < SCH_UI_LCD_ROWS; i++){
+		// Copy text to screen_chars if possible
+		int text_row = row_offset+i;
+		if(text_row >= number_of_rows){
+			// no need to print more
+			screen_chars[i][0] = '\n';
+		} else
+			// Copy and paste
+			strcpy(screen_chars[i], text[row_offset + i]);
+	}
+	
+	// Load cursor
+	if(show_cursor){
+		screen_chars[cursor_row-row_offset][0] = CURSOR_ICON;
 	}
 }
 void Screen::update_row_offset(){
@@ -30,16 +33,20 @@ void Screen::update_row_offset(){
 		// row offset is too small
 		row_offset = cursor_row - SCH_UI_LCD_ROWS + 1;
 }
-void Screen::increment_cursor(){
-	cursor_row++;
+void Screen::limit_cursor(){
 	if(cursor_row >= number_of_rows)
 		cursor_row= number_of_rows - 1;
+	if(cursor_row < cursor_row_min)
+		cursor_row = cursor_row_min;
+}
+void Screen::increment_cursor(){
+	cursor_row++;
+	limit_cursor();
 	update_row_offset();
 }
 void Screen::decrement_cursor(){
 	cursor_row--;
-	if(cursor_row < 0)
-		cursor_row = 0;
+	limit_cursor();
 	update_row_offset();
 }
 void Screen::reset_cursor(){
@@ -52,11 +59,25 @@ int Screen::get_cursor(){
 
 /********************* Main screen *********************/
 Main_Screen::Main_Screen(){
+	// Initialize data
+	row_offset = 0;
+	cursor_row = 1;
+	cursor_row_min = 1;
 	show_cursor = true;
 	number_of_rows = MAIN_SIZE;
-	strcpy(text[0], " Main screen:       ");
-	strcpy(text[1], " menu screen        ");
-	strcpy(text[2], " test screen        ");
+	
+	strcpy(text[0], "Main menu\n");
+	strcpy(text[1], " Line 1\n");
+	strcpy(text[2], " Line 2\n");
+	strcpy(text[3], " Line 3\n");
+	strcpy(text[4], " Line 4\n");
+	strcpy(text[5], " Line 5\n");
+	strcpy(text[6], " Line 6\n");
+	strcpy(text[7], " Line 7\n");
+	
+}
+void Main_Screen::update_text(){
+	// No need to update
 }
 Screen::SCREEN_ID Main_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
 	// button resets cursor row
@@ -77,42 +98,42 @@ Screen::SCREEN_ID Main_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::E
 	return Screen::MAIN_SCREEN;
 }
 
-/********************* Menu screen *********************/
-Menu_Screen::Menu_Screen(){
-	show_cursor = true;
-	number_of_rows = MENU_SIZE;
-	strcpy(text[0], " welcome            ");
-	strcpy(text[1], " to the             ");
-	strcpy(text[2], " menu screen        ");
-	strcpy(text[3], " not much           ");
-	strcpy(text[4], " to see right?      ");
-}
-Screen::SCREEN_ID Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
-	// button resets cursor row
-	if(btn == Encoder::LONG_PUSH)
-		return Screen::MAIN_SCREEN;
-				
-	// dir increments or decrements cursor row
-	if(dir == Encoder::CLOCKWISE)
-		increment_cursor();
-	else if(dir == Encoder::COUNTERCLOCKWISE)
-		decrement_cursor();
-	
-	// don't change screens
-	return Screen::MENU_SCREEN;
-}
-
-/********************* Test screen *********************/
-Test_Screen::Test_Screen(){
-	show_cursor = false;
-	number_of_rows = TEST_SIZE;
-	strcpy(text[0], "test screen         ");
-}
-Screen::SCREEN_ID Test_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
-	// button resets cursor row
-	if(btn == Encoder::LONG_PUSH)
-		return Screen::MAIN_SCREEN;
-	
-	// don't change screens
-	return Screen::TEST_SCREEN;
-}
+// /********************* Menu screen *********************/
+// Menu_Screen::Menu_Screen(){
+// 	show_cursor = true;
+// 	number_of_rows = MENU_SIZE;
+// 	strcpy(text[0], " welcome            ");
+// 	strcpy(text[1], " to the             ");
+// 	strcpy(text[2], " menu screen        ");
+// 	strcpy(text[3], " not much           ");
+// 	strcpy(text[4], " to see right?      ");
+// }
+// Screen::SCREEN_ID Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+// 	// button resets cursor row
+// 	if(btn == Encoder::LONG_PUSH)
+// 		return Screen::MAIN_SCREEN;
+// 				
+// 	// dir increments or decrements cursor row
+// 	if(dir == Encoder::CLOCKWISE)
+// 		increment_cursor();
+// 	else if(dir == Encoder::COUNTERCLOCKWISE)
+// 		decrement_cursor();
+// 	
+// 	// don't change screens
+// 	return Screen::MENU_SCREEN;
+// }
+// 
+// /********************* Test screen *********************/
+// Test_Screen::Test_Screen(){
+// 	show_cursor = false;
+// 	number_of_rows = TEST_SIZE;
+// 	strcpy(text[0], "test screen         ");
+// }
+// Screen::SCREEN_ID Test_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+// 	// button resets cursor row
+// 	if(btn == Encoder::LONG_PUSH)
+// 		return Screen::MAIN_SCREEN;
+// 	
+// 	// don't change screens
+// 	return Screen::TEST_SCREEN;
+// }
