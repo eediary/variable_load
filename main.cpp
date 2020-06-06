@@ -48,11 +48,13 @@ int main(void)
 	sei();
     while (1) 
     {
-		// Run load regulator
+		// Run load regulator and update state
 		LoadReg.regulate();
+		LoadReg.get_state(LR_state_var);
 		
-		// Run temp regulator
+		// Run temp regulator and update state
 		TempReg.regulate();
+		TempReg.get_state(TR_state_var);
 		
 		// Run user interface
 		UI.update_screen();

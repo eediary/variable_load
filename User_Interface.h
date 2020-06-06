@@ -22,9 +22,9 @@ TempRegulator::TR_state &_TR_state;
 HAL_Timer &Timer;
 Encoder Enc;
 LiquidCrystal_PCF8574 Lcd;
-Main_Screen Main_screen;
-// Menu_Screen Menu_screen;
-// Test_Screen Test_screen;
+// Screens
+VL_Screen VL_screen;
+Main_Menu_Screen Main_menu_screen;
 // Data members
 int cur_col, cur_row; // col and row to print
 long last_update; // last time screen was updated
