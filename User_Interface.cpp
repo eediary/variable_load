@@ -7,7 +7,8 @@ User_Interface::User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulato
 	Enc(SCH_UI_A_PORT, SCH_UI_A_PIN, SCH_UI_B_PORT, SCH_UI_B_PIN, SCH_UI_BTN_PORT, SCH_UI_BTN_PIN, Timer, SCH_UI_ENC_LEAD),
 	Lcd(SCH_UI_LCD_ADDR),
 	VL_screen(_LR_state, _TR_state),
-	Main_menu_screen()
+	Main_menu_screen(),
+	LR_Mode_screen(_LR_state)
 {
 	// Initialize variables
 	cur_row = 0;
@@ -84,6 +85,9 @@ void User_Interface::update_screen(){
 			break;
 		case(Screen::MAIN_MENU_SCREEN):
 			cur_screen = &Main_menu_screen;
+			break;
+		case(Screen::LR_MODE_SCREEN):
+			cur_screen = &LR_Mode_screen;
 			break;
 	}
 }

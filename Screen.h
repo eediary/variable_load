@@ -19,13 +19,15 @@
 // Screen sizes
 #define VL_SIZE (4)
 #define MAIN_MENU_SIZE (6)
+#define LR_MODE_SIZE (6)
 
 /********************* Screen class *********************/
 class Screen{
 public:
 	enum SCREEN_ID{
 		VL_SCREEN,
-		MAIN_MENU_SCREEN
+		MAIN_MENU_SCREEN,
+		LR_MODE_SCREEN
 	};
 protected:
 	int row_offset;
@@ -65,5 +67,15 @@ private:
 	virtual void update_text();
 public:
 	Main_Menu_Screen();
+	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
+};
+
+/********************* LR Mode screen *********************/
+class LR_Mode_Screen : public Screen{
+private:
+	virtual void update_text();
+	LoadRegulator::LR_state &_LR_state;
+public:
+	LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
