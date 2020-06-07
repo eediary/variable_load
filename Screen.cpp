@@ -115,6 +115,7 @@ Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Enc
 	// Push toggle output enable
 	if(btn == Encoder::PUSH){
 		// Toggle output enable, don't change screen
+		asm("nop");
 		return Screen::VL_SCREEN;
 	}
 	
@@ -155,6 +156,9 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 			case(1):
 				// Go to LR mode screen
 				return Screen::LR_MODE_SCREEN;
+			case(2):
+				// Go to LR val screen
+				return Screen::LR_VAL_SCREEN;
 			default:
 				// Shouldn't be here; return to VL screen
 				return Screen::VL_SCREEN;
@@ -240,4 +244,109 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 	
 	// don't change screens
 	return Screen::LR_MODE_SCREEN;
+}
+/********************* LR Val screen *********************/
+LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
+	_LR_state(LR_state_r)
+{
+	// Initialize data
+	row_offset = 0;
+	cursor_row = 1;
+	cursor_row_min = 1;
+	show_cursor = false;
+	number_of_rows = LR_VAL_SIZE;
+	update_local_val = true;
+	local_target_val = 0;
+	
+	strcpy(text[0], "Set target value: \n");
+	strcpy(text[1], "           000.00 A\n");
+
+}
+void LR_Val_Screen::update_text(){
+	// Update local value if necessary
+	if(update_local_val){
+		// Update local value from actual target value
+		update_local_val = false;
+		switch(_LR_state._op_mode){
+			case(LoadRegulator::CC):
+				local_target_val = _LR_state._target_current;
+				break;
+			case(LoadRegulator::CP):
+				local_target_val = _LR_state._target_power;
+				break;
+			case(LoadRegulator::CR):
+				local_target_val = _LR_state._target_resistance;
+				break;
+			case(LoadRegulator::CV):
+				local_target_val = _LR_state._target_voltage;
+				break;
+			default:
+				// Shouldn't be here
+				local_target_val = 0;
+				break;
+		}
+	}
+	
+	// Update text to show local value
+	dtostrf(local_target_val, SET_UI_LOCAL_TARGET_WIDTH, SET_UI_LOCAL_TARGET_DECIMAL, text[1]);
+	switch(_LR_state._op_mode){
+		case(LoadRegulator::CC):
+			strcat(text[1], " A\n");
+			break;
+		case(LoadRegulator::CP):
+			strcat(text[1], " W\n");
+			break;
+		case(LoadRegulator::CR):
+			strcat(text[1], " R\n");
+			break;
+		case(LoadRegulator::CV):
+			strcat(text[1], " V\n");
+			break;
+		default:
+			// Shouldn't be here
+			strcat(text[1], "\n");
+			break;
+	}
+}
+Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	// Push to save value
+	if(btn == Encoder::PUSH){
+		// Write local to actual
+		switch(_LR_state._op_mode){
+			case(LoadRegulator::CC):
+				_LR_state._target_current = local_target_val;
+				break;
+			case(LoadRegulator::CP):
+				_LR_state._target_current = local_target_val;
+				break;
+			case(LoadRegulator::CR):
+				_LR_state._target_current = local_target_val;
+				break;
+			case(LoadRegulator::CV):
+				_LR_state._target_current = local_target_val;
+				break;
+			default:
+				// Do nothing
+				break;
+		}
+		// Re-enable getting local val before exiting
+		update_local_val = true;
+		// Return to main menu
+		return Screen::MAIN_MENU_SCREEN;
+	}
+	
+	// Long push returns to VL screen
+	if(btn == Encoder::LONG_PUSH){
+		// Go to VL Screen
+		return Screen::VL_SCREEN;
+	}
+	
+	// dir increments or decrements local target value
+	if(dir == Encoder::CLOCKWISE)
+		local_target_val += 0.1;
+	else if(dir == Encoder::COUNTERCLOCKWISE)
+		local_target_val -= 0.1;
+	
+	// don't change screens
+	return Screen::LR_VAL_SCREEN;
 }

@@ -20,6 +20,7 @@
 #define VL_SIZE (4)
 #define MAIN_MENU_SIZE (6)
 #define LR_MODE_SIZE (6)
+#define LR_VAL_SIZE (2)
 
 /********************* Screen class *********************/
 class Screen{
@@ -27,7 +28,8 @@ public:
 	enum SCREEN_ID{
 		VL_SCREEN,
 		MAIN_MENU_SCREEN,
-		LR_MODE_SCREEN
+		LR_MODE_SCREEN,
+		LR_VAL_SCREEN
 	};
 protected:
 	int row_offset;
@@ -77,5 +79,16 @@ private:
 	LoadRegulator::LR_state &_LR_state;
 public:
 	LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r);
+	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
+};
+/********************* LR Val screen *********************/
+class LR_Val_Screen : public Screen{
+private:
+	bool update_local_val; // flag for copying target val to local variable
+	float local_target_val; // local variable that will be copied to target val
+	virtual void update_text();
+	LoadRegulator::LR_state &_LR_state;
+public:
+	LR_Val_Screen(LoadRegulator::LR_state &LR_state_r);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
