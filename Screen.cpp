@@ -151,10 +151,14 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 	// Push to go to submenu
 	if(btn == Encoder::PUSH){
 		// Change screen; WIP
-// 		if(get_cursor() == 1)
-// 			return Screen::MENU_SCREEN;
-// 		else if(get_cursor() == 2)
-// 			return Screen::TEST_SCREEN;
+		switch(get_cursor()){
+			case(1):
+				// Go to LR mode screen
+				return Screen::LR_MODE_SCREEN;
+			default:
+				// Shouldn't be here; return to VL screen
+				return Screen::VL_SCREEN;
+		}
 	}
 	
 	// Long push returns to VL screen
@@ -171,4 +175,69 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 	
 	// don't change screens
 	return Screen::MAIN_MENU_SCREEN;
+}
+/********************* LR Mode screen *********************/
+LR_Mode_Screen::LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r):
+	_LR_state(LR_state_r)
+{
+	// Initialize data
+	row_offset = 0;
+	cursor_row = 1;
+	cursor_row_min = 1;
+	show_cursor = true;
+	number_of_rows = LR_MODE_SIZE;
+	
+	strcpy(text[0], "LR Mode\n");
+	strcpy(text[1], " CC\n");
+	strcpy(text[2], " CP\n");
+	strcpy(text[3], " CR\n");
+	strcpy(text[4], " CV\n");
+	strcpy(text[5], " OFF\n");
+
+}
+void LR_Mode_Screen::update_text(){
+	// No need to update text
+}
+Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	// Push to select mode
+	if(btn == Encoder::PUSH){
+		// Update load regulator mode
+		switch(get_cursor()){
+			case(1):
+				_LR_state._op_mode = LoadRegulator::CC;
+				break;
+			case(2):
+				_LR_state._op_mode = LoadRegulator::CP;
+				break;
+			case(3):
+				_LR_state._op_mode = LoadRegulator::CR;
+				break;
+			case(4):
+				_LR_state._op_mode = LoadRegulator::CV;
+				break;
+			case(5):
+				_LR_state._op_mode = LoadRegulator::OFF;
+				break;
+			default:
+				// Shouldn't be here; do nothing
+				break;	
+		}
+		// Return to main menu
+		return Screen::MAIN_MENU_SCREEN;
+	}
+	
+	// Long push returns to VL screen
+	if(btn == Encoder::LONG_PUSH){
+		// Go to VL Screen
+		return Screen::VL_SCREEN;
+	}
+	
+	// dir increments or decrements cursor row
+	if(dir == Encoder::CLOCKWISE)
+		increment_cursor();
+	else if(dir == Encoder::COUNTERCLOCKWISE)
+		decrement_cursor();
+	
+	// don't change screens
+	return Screen::LR_MODE_SCREEN;
 }
