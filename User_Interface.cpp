@@ -10,7 +10,8 @@ User_Interface::User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulato
 	Main_menu_screen(),
 	LR_Mode_screen(_LR_state),
 	LR_Val_screen(_LR_state),
-	TR_Val_screen(_TR_state)
+	TR_Val_screen(_TR_state),
+	Info_screen()
 {
 	// Initialize variables
 	cur_row = 0;
@@ -96,6 +97,9 @@ void User_Interface::update_screen(){
 			break;
 		case(Screen::TR_VAL_SCREEN):
 			cur_screen = &TR_Val_screen;
+			break;
+		case(Screen::INFO_SCREEN):
+			cur_screen = &Info_screen;
 			break;
 	}
 }

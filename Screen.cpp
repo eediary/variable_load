@@ -164,6 +164,9 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 			case(3):
 				// Go to TR val screen
 				return Screen::TR_VAL_SCREEN;
+			case(4):
+				// Go to Info screen
+				return Screen::INFO_SCREEN;
 			default:
 				// Shouldn't be here; return to VL screen
 				return Screen::VL_SCREEN;
@@ -412,7 +415,7 @@ Screen::SCREEN_ID TR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 	// Long push returns to VL screen
 	if(btn == Encoder::LONG_PUSH){
 		// Go to VL screen
-		return Screen::MAIN_MENU_SCREEN;
+		return Screen::VL_SCREEN;
 	}
 	
 	// dir increments or decrements index
@@ -429,4 +432,42 @@ Screen::SCREEN_ID TR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 	
 	// don't change screens
 	return Screen::TR_VAL_SCREEN;
+}
+/********************* Info screen *********************/
+Info_Screen::Info_Screen()
+{
+	// Initialize data
+	row_offset = 0;
+	cursor_row = 0;
+	cursor_row_min = 0;
+	show_cursor = false;
+	number_of_rows = INFO_SIZE;
+	strcpy(text[0], "EE Diary \n");
+	strcpy(text[1], "Variable load \n");
+	strcpy(text[2], "2020\n");
+	
+}
+void Info_Screen::update_text(){
+	// no need to update text
+}
+Screen::SCREEN_ID Info_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	// Push to go back to main menu
+	if(btn == Encoder::PUSH){
+		return MAIN_MENU_SCREEN;
+	}
+	
+	// Long push returns to VL screen
+	if(btn == Encoder::LONG_PUSH){
+		// Go to VL screen
+		return Screen::VL_SCREEN;
+	}
+	
+	// dir does nothing
+// 	if(dir == Encoder::CLOCKWISE)
+// 		increment_cursor();
+// 	else if(dir == Encoder::COUNTERCLOCKWISE)
+// 		decrement_cursor();
+	
+	// don't change screens
+	return Screen::INFO_SCREEN;
 }
