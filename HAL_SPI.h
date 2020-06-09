@@ -62,9 +62,9 @@ void set_ss_dir(SPI_SS_DIR ss_dir){
 	// WARNING: if SPI is in master mode and SS is input,
 	//   SS going low will cause SPI to go into slave mode
 	if(ss_dir == SPI_INPUT)
-	DDRB &= ~(0b1 << DDB0);
+		DDRB &= ~(0b1 << DDB0);
 	else
-	DDRB |= (0b1 << DDB0);
+		DDRB |= (0b1 << DDB0);
 }
 void set_clk(SPI_CLK_SEL clk_sel)
 {

@@ -8,7 +8,8 @@ User_Interface::User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulato
 	Lcd(SCH_UI_LCD_ADDR),
 	VL_screen(_LR_state, _TR_state),
 	Main_menu_screen(),
-	LR_Mode_screen(_LR_state)
+	LR_Mode_screen(_LR_state),
+	LR_Val_screen(_LR_state)
 {
 	// Initialize variables
 	cur_row = 0;
@@ -88,6 +89,9 @@ void User_Interface::update_screen(){
 			break;
 		case(Screen::LR_MODE_SCREEN):
 			cur_screen = &LR_Mode_screen;
+			break;
+		case(Screen::LR_VAL_SCREEN):
+			cur_screen = &LR_Val_screen;
 			break;
 	}
 }
