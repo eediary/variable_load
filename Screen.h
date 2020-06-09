@@ -18,9 +18,10 @@
 
 // Screen sizes
 #define VL_SIZE (4)
-#define MAIN_MENU_SIZE (6)
+#define MAIN_MENU_SIZE (5)
 #define LR_MODE_SIZE (6)
 #define LR_VAL_SIZE (2)
+#define TR_VAL_SIZE (2)
 
 /********************* Screen class *********************/
 class Screen{
@@ -29,7 +30,8 @@ public:
 		VL_SCREEN,
 		MAIN_MENU_SCREEN,
 		LR_MODE_SCREEN,
-		LR_VAL_SCREEN
+		LR_VAL_SCREEN,
+		TR_VAL_SCREEN
 	};
 protected:
 	int row_offset;
@@ -90,5 +92,16 @@ private:
 	LoadRegulator::LR_state &_LR_state;
 public:
 	LR_Val_Screen(LoadRegulator::LR_state &LR_state_r);
+	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
+};
+/********************* TR Val screen *********************/
+class TR_Val_Screen : public Screen{
+private:
+	int index; // used to determine duty cycle
+	int index_to_duty_cycle();
+	virtual void update_text();
+	TempRegulator::TR_state &_TR_state;
+public:
+	TR_Val_Screen(TempRegulator::TR_state &TR_state_r);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };

@@ -27,6 +27,7 @@ VL_Screen VL_screen;
 Main_Menu_Screen Main_menu_screen;
 LR_Mode_Screen LR_Mode_screen;
 LR_Val_Screen LR_Val_screen;
+TR_Val_Screen TR_Val_screen;
 // Data members
 int cur_col, cur_row; // col and row to print
 long last_update; // last time screen was updated

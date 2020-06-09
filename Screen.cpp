@@ -133,16 +133,15 @@ Main_Menu_Screen::Main_Menu_Screen(){
 	// Initialize data
 	row_offset = 0;
 	cursor_row = 1;
-	cursor_row_min = 1;
+	cursor_row_min = 0;
 	show_cursor = true;
 	number_of_rows = MAIN_MENU_SIZE;
 	
-	strcpy(text[0], "Main menu\n");
+	strcpy(text[0], " Back\n");
 	strcpy(text[1], " Set mode\n");
 	strcpy(text[2], " Set target\n");
-	strcpy(text[3], " Debugger\n");
-	strcpy(text[4], " Fan Control\n");
-	strcpy(text[5], " Info\n");
+	strcpy(text[3], " Fan Control\n");
+	strcpy(text[4], " Info\n");
 	
 }
 void Main_Menu_Screen::update_text(){
@@ -153,12 +152,18 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 	if(btn == Encoder::PUSH){
 		// Change screen; WIP
 		switch(get_cursor()){
+			case(0):
+				// Go to VL screen
+				return Screen::VL_SCREEN;
 			case(1):
 				// Go to LR mode screen
 				return Screen::LR_MODE_SCREEN;
 			case(2):
 				// Go to LR val screen
 				return Screen::LR_VAL_SCREEN;
+			case(3):
+				// Go to TR val screen
+				return Screen::TR_VAL_SCREEN;
 			default:
 				// Shouldn't be here; return to VL screen
 				return Screen::VL_SCREEN;
@@ -351,4 +356,77 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 	
 	// don't change screens
 	return Screen::LR_VAL_SCREEN;
+}
+/********************* TR Val screen *********************/
+TR_Val_Screen::TR_Val_Screen(TempRegulator::TR_state &TR_state_r):
+_TR_state(TR_state_r)
+{
+	// Initialize data
+	row_offset = 0;
+	cursor_row = 0;
+	cursor_row_min = 0;
+	show_cursor = false;
+	number_of_rows = TR_VAL_SIZE;
+	
+	strcpy(text[0], "Select fan operation\n");
+	strcpy(text[1], "\n");
+	
+}
+int TR_Val_Screen::index_to_duty_cycle(){
+	// if Index = 0, output is irrelevant
+	// Otherwise, duty cycle = (index - 1) * 5, between 0 and 100 inclusive
+	int to_return = (index - 1) * 5;
+	if(to_return < 0)
+		to_return = 0;
+	else if(to_return > 100)
+		to_return = 100;
+	return to_return;
+}
+void TR_Val_Screen::update_text(){
+	// Update value that is displayed
+	if(index){
+		// index is non-zero; display number
+		itoa(index_to_duty_cycle(), text[1], 10);
+		strcat(text[1], " %\n");
+	} else{
+		// index is zero; display AUTO
+		strcpy(text[1], "AUTO\n");
+	}
+}
+Screen::SCREEN_ID TR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	// Push to update TR state
+	if(btn == Encoder::PUSH){
+		// Update TR state, then return to main menu
+		if(index){
+			// put TR into manual mode, adjust duty cycle
+			_TR_state._duty_cycle = index_to_duty_cycle();
+			_TR_state._enable = false;
+		} else{
+			// put TR into auto mode
+			_TR_state._enable = true;
+		}
+		_TR_state._update = true;
+		return MAIN_MENU_SCREEN;
+	}
+	
+	// Long push returns to VL screen
+	if(btn == Encoder::LONG_PUSH){
+		// Go to VL screen
+		return Screen::MAIN_MENU_SCREEN;
+	}
+	
+	// dir increments or decrements index
+	if(dir == Encoder::CLOCKWISE)
+		index++;
+	else if(dir == Encoder::COUNTERCLOCKWISE)
+		index--;
+	
+	// bound index
+	if(index < 0)
+		index = 0;
+	else if(index > 21)
+		index = 21;
+	
+	// don't change screens
+	return Screen::TR_VAL_SCREEN;
 }
