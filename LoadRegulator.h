@@ -27,6 +27,7 @@ struct LR_state
 	float _target_power;
 	float _target_resistance;
 	float _target_voltage;
+	bool _update;
 	
 	// Read only
 	float _measured_current;
@@ -130,6 +131,7 @@ void get_state(LR_state &state){
 	state._target_power = target_power;
 	state._target_resistance = target_resistance;
 	state._target_voltage = target_voltage;
+	state._update = false;
 	state._measured_current = measured_current;
 	state._measured_voltage = measured_voltage;
 	state._control_current = control_current;
@@ -137,11 +139,15 @@ void get_state(LR_state &state){
 void set_state(LR_state &state){
 	// Only uses writable members
 	// Allows quick configuration of instance
-	op_mode = state._op_mode;
-	target_current = state._target_current;
-	target_power = state._target_power;
-	target_resistance = state._target_resistance;
-	target_voltage = state._target_voltage;
+	// Update if flag is set to update
+	if(state._update){
+		state._update = false;
+		op_mode = state._op_mode;
+		target_current = state._target_current;
+		target_power = state._target_power;
+		target_resistance = state._target_resistance;
+		target_voltage = state._target_voltage;
+	}
 	
 	// Does not update measured_current, measured_voltage or control_cur
 }

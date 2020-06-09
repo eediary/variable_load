@@ -226,7 +226,8 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 				// Shouldn't be here; do nothing
 				break;	
 		}
-		// Return to main menu
+		// Enable update and return to main menu
+		_LR_state._update = true;
 		return Screen::MAIN_MENU_SCREEN;
 	}
 	
@@ -331,7 +332,8 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 		}
 		// Re-enable getting local val before exiting
 		update_local_val = true;
-		// Return to main menu
+		// Enable update and return to main menu
+		_LR_state._update = true;
 		return Screen::MAIN_MENU_SCREEN;
 	}
 	

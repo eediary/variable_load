@@ -59,6 +59,10 @@ int main(void)
 		// Run user interface
 		UI.update_screen();
 		
+		// Update regulators
+		LoadReg.set_state(LR_state_var);
+		TempReg.set_state(TR_state_var);
+		
 		// Run debugger
 		#if DEBUG == 1
 		DebuggerModule.run_debugger();

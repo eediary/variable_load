@@ -13,6 +13,7 @@ struct TR_state{
 	// Read / write
 	bool _enable;
 	int _duty_cycle;
+	bool _update;
 	
 	// Read only
 	float _temp_volt;
@@ -57,12 +58,17 @@ void get_state(TR_state &state){
 	// Allows quick extraction of info
 	state._enable = enable;
 	state._duty_cycle = duty_cycle;
+	state._update = false;
 	state._temp_volt = temp_volt;
 }
 void set_state(TR_state &state){
 	// Allows quick configuration of info
-	enable = state._enable;
-	duty_cycle = state._duty_cycle;
+	// Only update if flag is set
+	if(state._update){
+		state._update = false;
+		enable = state._enable;
+		duty_cycle = state._duty_cycle;
+	}
 	
 	// don't update t_volt
 }
