@@ -1,4 +1,6 @@
 #pragma once
+// Standard headers
+#include <string.h>
 // Project headers
 #include "schematic.h"
 #include "settings.h"
@@ -15,7 +17,8 @@
 
 class Debugger{
 private:
-char char_buffer[SET_UART_CHAR_BUFFER_SIZE];
+char char_rx_buffer[SET_UART_RX_BUFFER_SIZE];
+char char_tx_buffer[SET_UART_TX_BUFFER_SIZE];
 
 // Class members
 LoadRegulator &LR_r;
@@ -28,6 +31,9 @@ LED LED_Y;
 LED LED_R;
 // Data members
 unsigned long last_time; // last time called, in ms
+// Methods
+void append_float(float val);
+void append_duty_cycle();
 
 public:
 Debugger(LoadRegulator &LoadRegulator_r, TempRegulator &TempRegulator_r, HAL_Timer &Timer_r);
