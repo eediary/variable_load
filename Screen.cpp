@@ -341,13 +341,13 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 				_LR_state._target_current = local_target_val;
 				break;
 			case(LoadRegulator::CP):
-				_LR_state._target_current = local_target_val;
+				_LR_state._target_power = local_target_val;
 				break;
 			case(LoadRegulator::CR):
-				_LR_state._target_current = local_target_val;
+				_LR_state._target_resistance = local_target_val;
 				break;
 			case(LoadRegulator::CV):
-				_LR_state._target_current = local_target_val;
+				_LR_state._target_voltage = local_target_val;
 				break;
 			default:
 				// Do nothing for OFF
@@ -362,6 +362,8 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 	
 	// Long push returns to VL screen
 	if(btn == Encoder::LONG_PUSH){
+		// Re-enable getting local val before exiting
+		update_local_val = true;
 		// Go to VL Screen
 		return Screen::VL_SCREEN;
 	}
@@ -373,9 +375,11 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 		local_target_val -= 0.1;
 	
 	// go to LR mode screen if mode is off; otherwise remain on screen
-	if(_LR_state._op_mode == LoadRegulator::OFF)
+	if(_LR_state._op_mode == LoadRegulator::OFF){
+		// Re-enable getting local val before exiting
+		update_local_val = true;
 		return Screen::LR_MODE_SCREEN;
-	else
+	}else
 		return Screen::LR_VAL_SCREEN;
 }
 /********************* TR Val screen *********************/

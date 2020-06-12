@@ -102,7 +102,7 @@ public:
 };
 /********************* LR Val screen *********************/
 #define LR_VAL_LINE_0 "Set target value:"
-#define LR_VAL_LINE_1 "           000.00 A"
+#define LR_VAL_LINE_1 " 000.00 A"
 class LR_Val_Screen : public Screen{
 private:
 	bool update_local_val; // flag for copying target val to local variable
