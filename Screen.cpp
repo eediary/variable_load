@@ -9,14 +9,18 @@ void Screen::update_screen_chars(char screen_chars[SCH_UI_LCD_ROWS][SCH_UI_LCD_C
 	
 	// Load text to screen_chars
 	for(int i = 0; i < SCH_UI_LCD_ROWS; i++){
-		// Copy text to screen_chars if possible
-		int text_row = row_offset+i;
-		if(text_row >= number_of_rows){
-			// no need to print more
-			screen_chars[i][0] = '\n';
-		} else
+		// Copy text to screen_chars if text should be visible on screen
+		if(row_offset+i < number_of_rows){
 			// Copy and paste
 			strcpy(screen_chars[i], text[row_offset + i]);
+			
+			// Fill rest of line with blanks
+			for(int j = strlen(screen_chars[i]); j < SCH_UI_LCD_COLS; j++){
+				screen_chars[i][j] = ' ';
+			}
+		} else
+			// If no text should be visible, fill with blank lines
+			strcpy(screen_chars[i], BLANK_LINE);
 	}
 	
 	// Load cursor
@@ -80,14 +84,14 @@ void VL_Screen::update_text(){
 	// Update Duty cycle of fan
 	// Update measured voltage
 	dtostrf(_LR_state._measured_voltage, SET_UI_MEASURED_VOLT_WIDTH, SET_UI_MEASURED_VOLT_DECIMAL, text[0]);
-	strcat(text[0], " V\n");
+	strcat(text[0], " V");
 	// Update measured current
 	dtostrf(_LR_state._measured_current, SET_UI_MEASURED_CURR_WIDTH, SET_UI_MEASURED_CURR_DECIMAL, text[1]);
-	strcat(text[1], " A\n");
+	strcat(text[1], " A");
 	// Update measured power
 	float measured_power = _LR_state._measured_voltage * _LR_state._measured_current;
 	dtostrf(measured_power, SET_UI_MEASURED_POW_WIDTH, SET_UI_MEASURED_POW_DECIMAL, text[2]);
-	strcat(text[2], " W\n");
+	strcat(text[2], " W");
 	// Update mode
 	switch(_LR_state._op_mode){
 		case(LoadRegulator::CC):
@@ -109,7 +113,7 @@ void VL_Screen::update_text(){
 	// Update duty cycle
 	strcat(text[3], "            ");
 	itoa(_TR_state._duty_cycle, text[3]+15, 10);
-	strcat(text[3], "%\n");
+	strcat(text[3], "%");
 }
 Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
 	// Push toggle output enable
@@ -300,20 +304,20 @@ void LR_Val_Screen::update_text(){
 	dtostrf(local_target_val, SET_UI_LOCAL_TARGET_WIDTH, SET_UI_LOCAL_TARGET_DECIMAL, text[1]);
 	switch(_LR_state._op_mode){
 		case(LoadRegulator::CC):
-			strcat(text[1], " A\n");
+			strcat(text[1], " A");
 			break;
 		case(LoadRegulator::CP):
-			strcat(text[1], " W\n");
+			strcat(text[1], " W");
 			break;
 		case(LoadRegulator::CR):
-			strcat(text[1], " R\n");
+			strcat(text[1], " R");
 			break;
 		case(LoadRegulator::CV):
-			strcat(text[1], " V\n");
+			strcat(text[1], " V");
 			break;
 		default:
 			// Shouldn't be here
-			strcat(text[1], "\n");
+			strcat(text[1], "");
 			break;
 	}
 }
@@ -390,10 +394,10 @@ void TR_Val_Screen::update_text(){
 	if(index){
 		// index is non-zero; display number
 		itoa(index_to_duty_cycle(), text[1], 10);
-		strcat(text[1], " %\n");
+		strcat(text[1], " %");
 	} else{
 		// index is zero; display AUTO
-		strcpy(text[1], "AUTO\n");
+		strcpy(text[1], "AUTO");
 	}
 }
 Screen::SCREEN_ID TR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){

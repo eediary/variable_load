@@ -40,7 +40,7 @@ void User_Interface::update_screen(){
 	{
 		// Reset cursor and row
 		// Set and clear flags, preventing further execution until clear completes
-		Lcd.clear_no_delay();
+		// Lcd.clear_no_delay();
 		cur_col = 0;
 		cur_row = 0;
 		wait_for_clear_flag = true;
@@ -61,7 +61,7 @@ void User_Interface::update_screen(){
 	if(print_flag){
 		// Print screen_chars
 		char cur_char = screen_chars[cur_row][cur_col];
-		if((cur_char == '\n') || (cur_col >= SCH_UI_LCD_COLS)){
+		if(cur_col >= SCH_UI_LCD_COLS){
 			// end of current line
 			// either get next line, or stop printing since you're done with screen
 			if(++cur_row >= SCH_UI_LCD_ROWS){

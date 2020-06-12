@@ -43,7 +43,7 @@ protected:
 	uint8_t number_of_rows; // number of rows for this screen
 	
 	void update_row_offset();
-	char text[SET_UI_SCREEN_MAX_LINES][SCH_UI_LCD_COLS + 2]; // all text for screen
+	char text[SET_UI_SCREEN_MAX_LINES][SCH_UI_LCD_COLS+1]; // all text for screen
 	void limit_cursor();
 	void increment_cursor();
 	void decrement_cursor();
@@ -57,9 +57,9 @@ public:
 };
 
 /********************* VL screen *********************/
-#define VL_SCREEN_LINE_0 "00.00 V\n"
-#define VL_SCREEN_LINE_1 "00.00 A\n"
-#define VL_SCREEN_LINE_2 "000.00 W\n"
+#define VL_SCREEN_LINE_0 "00.00 V"
+#define VL_SCREEN_LINE_1 "00.00 A"
+#define VL_SCREEN_LINE_2 "000.00 W"
 #define VL_SCREEN_LINE_3 "OFF             000%"
 class VL_Screen : public Screen{
 	private:
@@ -72,11 +72,11 @@ class VL_Screen : public Screen{
 };
 
 /********************* Main Menu screen *********************/
-#define MAIN_MENU_LINE_0 " Back\n"
-#define MAIN_MENU_LINE_1 " Set mode\n"
-#define MAIN_MENU_LINE_2 " Set target\n"
-#define MAIN_MENU_LINE_3 " Fan Control\n"
-#define MAIN_MENU_LINE_4 " Info\n"
+#define MAIN_MENU_LINE_0 " Back"
+#define MAIN_MENU_LINE_1 " Set mode"
+#define MAIN_MENU_LINE_2 " Set target"
+#define MAIN_MENU_LINE_3 " Fan Control"
+#define MAIN_MENU_LINE_4 " Info"
 class Main_Menu_Screen : public Screen{
 private:
 	virtual void update_text();
@@ -86,12 +86,12 @@ public:
 };
 
 /********************* LR Mode screen *********************/
-#define LR_MODE_LINE_0 "LR Mode\n"
-#define LR_MODE_LINE_1 " CC\n"
-#define LR_MODE_LINE_2 " CP\n"
-#define LR_MODE_LINE_3 " CR\n"
-#define LR_MODE_LINE_4 " CV\n"
-#define LR_MODE_LINE_5 " OFF\n"
+#define LR_MODE_LINE_0 "LR Mode"
+#define LR_MODE_LINE_1 " CC"
+#define LR_MODE_LINE_2 " CP"
+#define LR_MODE_LINE_3 " CR"
+#define LR_MODE_LINE_4 " CV"
+#define LR_MODE_LINE_5 " OFF"
 class LR_Mode_Screen : public Screen{
 private:
 	virtual void update_text();
@@ -101,8 +101,8 @@ public:
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 /********************* LR Val screen *********************/
-#define LR_VAL_LINE_0 "Set target value: \n"
-#define LR_VAL_LINE_1 "           000.00 A\n"
+#define LR_VAL_LINE_0 "Set target value:"
+#define LR_VAL_LINE_1 "           000.00 A"
 class LR_Val_Screen : public Screen{
 private:
 	bool update_local_val; // flag for copying target val to local variable
@@ -114,8 +114,8 @@ public:
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 /********************* TR Val screen *********************/
-#define TR_VAL_LINE_0 "Select fan operation\n"
-#define TR_VAL_LINE_1 "\n"
+#define TR_VAL_LINE_0 "Select fan operation"
+#define TR_VAL_LINE_1 ""
 class TR_Val_Screen : public Screen{
 private:
 	int index; // used to determine duty cycle
@@ -127,9 +127,9 @@ public:
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 /********************* Info screen *********************/
-#define INFO_LINE_0 "EE Diary \n"
-#define INFO_LINE_1 "Variable load \n"
-#define INFO_LINE_2 "2020\n"
+#define INFO_LINE_0 "EE Diary"
+#define INFO_LINE_1 "Variable load"
+#define INFO_LINE_2 "2020"
 class Info_Screen : public Screen{
 	private:
 	virtual void update_text();
