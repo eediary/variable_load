@@ -38,9 +38,11 @@ void User_Interface::update_screen(){
 		(dir != Encoder::NONE) || 
 		(press != Encoder::NO_PUSH))
 	{
-		// Clear LCD
-		// Set flag, preventing further execution until clear completes
+		// Clear LCD, reset cursor and row
+		// Set and clear flags, preventing further execution until clear completes
 		Lcd.clear_no_delay();
+		cur_col = 0;
+		cur_row = 0;
 		wait_for_clear_flag = true;
 		print_flag = false;
 		last_update = Timer.get_tick();
