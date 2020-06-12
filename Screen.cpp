@@ -198,8 +198,8 @@ LR_Mode_Screen::LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r):
 {
 	// Initialize data
 	row_offset = 0;
-	cursor_row = 1;
-	cursor_row_min = 1;
+	cursor_row = 0;
+	cursor_row_min = 0;
 	show_cursor = true;
 	number_of_rows = LR_MODE_SIZE;
 	
@@ -219,6 +219,9 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 	if(btn == Encoder::PUSH){
 		// Update load regulator mode
 		switch(get_cursor()){
+			case(0):
+				// Cancel; do nothing
+				break;
 			case(1):
 				_LR_state._op_mode = LoadRegulator::CC;
 				break;
@@ -238,9 +241,17 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 				// Shouldn't be here; do nothing
 				break;	
 		}
-		// Enable update and return to main menu
-		_LR_state._update = true;
-		return Screen::MAIN_MENU_SCREEN;
+		// If cancel was selected, do nothing; return to main menu
+		if(get_cursor() == 0)
+			return Screen::MAIN_MENU_SCREEN;
+		else{
+			// Enable update, then go to main menu if mode is off; otherwise go to LR Val screen
+			_LR_state._update = true;
+			if(_LR_state._op_mode == LoadRegulator::OFF)
+				return Screen::MAIN_MENU_SCREEN;
+			else
+				return Screen::LR_VAL_SCREEN;
+		}
 	}
 	
 	// Long push returns to VL screen
@@ -339,7 +350,7 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 				_LR_state._target_current = local_target_val;
 				break;
 			default:
-				// Do nothing
+				// Do nothing for OFF
 				break;
 		}
 		// Re-enable getting local val before exiting
@@ -361,8 +372,11 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 	else if(dir == Encoder::COUNTERCLOCKWISE)
 		local_target_val -= 0.1;
 	
-	// don't change screens
-	return Screen::LR_VAL_SCREEN;
+	// go to LR mode screen if mode is off; otherwise remain on screen
+	if(_LR_state._op_mode == LoadRegulator::OFF)
+		return Screen::LR_MODE_SCREEN;
+	else
+		return Screen::LR_VAL_SCREEN;
 }
 /********************* TR Val screen *********************/
 TR_Val_Screen::TR_Val_Screen(TempRegulator::TR_state &TR_state_r):
@@ -375,9 +389,7 @@ _TR_state(TR_state_r)
 	show_cursor = false;
 	number_of_rows = TR_VAL_SIZE;
 	
-	strcpy(text[0], TR_VAL_LINE_0);
-	strcpy(text[1], TR_VAL_LINE_1);
-	
+	strcpy(text[0], TR_VAL_LINE_0);	
 }
 int TR_Val_Screen::index_to_duty_cycle(){
 	// if Index = 0, output is irrelevant

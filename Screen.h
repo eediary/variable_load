@@ -86,7 +86,7 @@ public:
 };
 
 /********************* LR Mode screen *********************/
-#define LR_MODE_LINE_0 "LR Mode"
+#define LR_MODE_LINE_0 " Cancel"
 #define LR_MODE_LINE_1 " CC"
 #define LR_MODE_LINE_2 " CP"
 #define LR_MODE_LINE_3 " CR"
@@ -114,8 +114,7 @@ public:
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 /********************* TR Val screen *********************/
-#define TR_VAL_LINE_0 "Select fan operation"
-#define TR_VAL_LINE_1 ""
+#define TR_VAL_LINE_0 "Select fan speed"
 class TR_Val_Screen : public Screen{
 private:
 	int index; // used to determine duty cycle
