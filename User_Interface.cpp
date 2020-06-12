@@ -38,7 +38,7 @@ void User_Interface::update_screen(){
 		(dir != Encoder::NONE) || 
 		(press != Encoder::NO_PUSH))
 	{
-		// Clear LCD, reset cursor and row
+		// Reset cursor and row
 		// Set and clear flags, preventing further execution until clear completes
 		Lcd.clear_no_delay();
 		cur_col = 0;

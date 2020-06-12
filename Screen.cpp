@@ -69,10 +69,10 @@ VL_Screen::VL_Screen(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_stat
 	show_cursor = false;
 	number_of_rows = VL_SIZE;
 	
-	strcpy(text[0], "00.00 V\n");
-	strcpy(text[1], "00.00 A\n");
-	strcpy(text[2], "000.00 W\n");
-	strcpy(text[3], "OFF             000%");
+	strcpy(text[0], VL_SCREEN_LINE_0);
+	strcpy(text[1], VL_SCREEN_LINE_1);
+	strcpy(text[2], VL_SCREEN_LINE_2);
+	strcpy(text[3], VL_SCREEN_LINE_3);
 	
 }
 void VL_Screen::update_text(){
@@ -137,11 +137,11 @@ Main_Menu_Screen::Main_Menu_Screen(){
 	show_cursor = true;
 	number_of_rows = MAIN_MENU_SIZE;
 	
-	strcpy(text[0], " Back\n");
-	strcpy(text[1], " Set mode\n");
-	strcpy(text[2], " Set target\n");
-	strcpy(text[3], " Fan Control\n");
-	strcpy(text[4], " Info\n");
+	strcpy(text[0], MAIN_MENU_LINE_0);
+	strcpy(text[1], MAIN_MENU_LINE_1);
+	strcpy(text[2], MAIN_MENU_LINE_2);
+	strcpy(text[3], MAIN_MENU_LINE_3);
+	strcpy(text[4], MAIN_MENU_LINE_4);
 	
 }
 void Main_Menu_Screen::update_text(){
@@ -199,12 +199,12 @@ LR_Mode_Screen::LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r):
 	show_cursor = true;
 	number_of_rows = LR_MODE_SIZE;
 	
-	strcpy(text[0], "LR Mode\n");
-	strcpy(text[1], " CC\n");
-	strcpy(text[2], " CP\n");
-	strcpy(text[3], " CR\n");
-	strcpy(text[4], " CV\n");
-	strcpy(text[5], " OFF\n");
+	strcpy(text[0], LR_MODE_LINE_0);
+	strcpy(text[1], LR_MODE_LINE_1);
+	strcpy(text[2], LR_MODE_LINE_2);
+	strcpy(text[3], LR_MODE_LINE_3);
+	strcpy(text[4], LR_MODE_LINE_4);
+	strcpy(text[5], LR_MODE_LINE_5);
 
 }
 void LR_Mode_Screen::update_text(){
@@ -267,8 +267,8 @@ LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
 	update_local_val = true;
 	local_target_val = 0;
 	
-	strcpy(text[0], "Set target value: \n");
-	strcpy(text[1], "           000.00 A\n");
+	strcpy(text[0], LR_VAL_LINE_0);
+	strcpy(text[1], LR_VAL_LINE_1);
 
 }
 void LR_Val_Screen::update_text(){
@@ -371,8 +371,8 @@ _TR_state(TR_state_r)
 	show_cursor = false;
 	number_of_rows = TR_VAL_SIZE;
 	
-	strcpy(text[0], "Select fan operation\n");
-	strcpy(text[1], "\n");
+	strcpy(text[0], TR_VAL_LINE_0);
+	strcpy(text[1], TR_VAL_LINE_1);
 	
 }
 int TR_Val_Screen::index_to_duty_cycle(){
@@ -442,9 +442,9 @@ Info_Screen::Info_Screen()
 	cursor_row_min = 0;
 	show_cursor = false;
 	number_of_rows = INFO_SIZE;
-	strcpy(text[0], "EE Diary \n");
-	strcpy(text[1], "Variable load \n");
-	strcpy(text[2], "2020\n");
+	strcpy(text[0], INFO_LINE_0);
+	strcpy(text[1], INFO_LINE_1);
+	strcpy(text[2], INFO_LINE_2);
 	
 }
 void Info_Screen::update_text(){
