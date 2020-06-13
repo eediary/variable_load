@@ -169,10 +169,20 @@ void VL_Screen::update_text(){
 	strcat(text[3], " %");
 }
 Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	static LoadRegulator::operation_mode last_mode = LoadRegulator::OFF;
 	// Push toggle output enable
 	if(btn == Encoder::PUSH){
 		// Toggle output enable, don't change screen
-		asm("nop");
+		if(_LR_state._op_mode == LoadRegulator::OFF){
+			// Mode is OFF, so update to old mode
+			_LR_state._op_mode = last_mode;
+			_LR_state._update = true;
+		} else{
+			// Mode is not oFF, so save mode then disable
+			last_mode = _LR_state._op_mode;
+			_LR_state._op_mode = LoadRegulator::OFF;
+			_LR_state._update = true;
+		}
 		return Screen::VL_SCREEN;
 	}
 	
