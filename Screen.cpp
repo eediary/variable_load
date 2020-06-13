@@ -192,9 +192,148 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 	// don't change screens
 	return Screen::MAIN_MENU_SCREEN;
 }
-/********************* LR Mode screen *********************/
-LR_Mode_Screen::LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r):
+/********************* LR Val screen *********************/
+LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
 	_LR_state(LR_state_r)
+{
+	// Initialize data
+	row_offset = 0;
+	cursor_row = 1;
+	cursor_row_min = 1;
+	show_cursor = false;
+	number_of_rows = LR_VAL_SIZE;
+	update_local_val = true;
+	local_target_val = 0;
+	use_local_op_mode = false;
+	
+	strcpy(text[0], LR_VAL_LINE_0);
+	strcpy(text[1], LR_VAL_LINE_1);
+
+}
+void LR_Val_Screen::update_text(){
+	// use local op mode if coming from LR mode screen, or actual op mode if coming from main menu
+	LoadRegulator::operation_mode mode = (use_local_op_mode) ? local_op_mode : _LR_state._op_mode;
+	
+	// Update local value if necessary
+	if(update_local_val){
+		// Update local value from actual target value
+		update_local_val = false;
+		switch(mode){
+			case(LoadRegulator::CC):
+				local_target_val = _LR_state._target_current;
+				break;
+			case(LoadRegulator::CP):
+				local_target_val = _LR_state._target_power;
+				break;
+			case(LoadRegulator::CR):
+				local_target_val = _LR_state._target_resistance;
+				break;
+			case(LoadRegulator::CV):
+				local_target_val = _LR_state._target_voltage;
+				break;
+			default:
+				// Shouldn't be here
+				local_target_val = 0;
+				break;
+		}
+	}
+	
+	// Update text to show local value
+	dtostrf(local_target_val, SET_UI_LOCAL_TARGET_WIDTH, SET_UI_LOCAL_TARGET_DECIMAL, text[1]);
+	switch(mode){
+		case(LoadRegulator::CC):
+			strcat(text[1], " A");
+			break;
+		case(LoadRegulator::CP):
+			strcat(text[1], " W");
+			break;
+		case(LoadRegulator::CR):
+			strcat(text[1], " R");
+			break;
+		case(LoadRegulator::CV):
+			strcat(text[1], " V");
+			break;
+		default:
+			// Shouldn't be here
+			strcat(text[1], "");
+			break;
+	}
+}
+Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
+	// use local op mode if coming from LR mode screen, or actual op mode if coming from main menu
+	LoadRegulator::operation_mode mode = (use_local_op_mode) ? local_op_mode : _LR_state._op_mode;
+	
+	// Push to save value
+	if(btn == Encoder::PUSH){
+		// Use either local or actual op mode
+		switch(mode){
+			case(LoadRegulator::CC):
+				_LR_state._target_current = local_target_val;
+				_LR_state._op_mode = LoadRegulator::CC;
+				break;
+			case(LoadRegulator::CP):
+				_LR_state._target_power = local_target_val;
+				_LR_state._op_mode = LoadRegulator::CP;
+				break;
+			case(LoadRegulator::CR):
+				_LR_state._target_resistance = local_target_val;
+				_LR_state._op_mode = LoadRegulator::CR;
+				break;
+			case(LoadRegulator::CV):
+				_LR_state._target_voltage = local_target_val;
+				_LR_state._op_mode = LoadRegulator::CV;
+				break;
+			default:
+				// Do nothing for OFF
+				break;
+		}
+		// Re-enable getting local val before exiting
+		update_local_val = true;
+		// Disable using local op mode in case coming directly from main menu
+		use_local_op_mode = false;
+		// Enable update and return to main menu
+		_LR_state._update = true;
+		return Screen::MAIN_MENU_SCREEN;
+	}
+	
+	// Long push returns to VL screen
+	if(btn == Encoder::LONG_PUSH){
+		// Re-enable getting local val before exiting
+		update_local_val = true;
+		// Disable using local op mode in case coming directly from main menu
+		use_local_op_mode = false;
+		// Go to VL Screen
+		return Screen::VL_SCREEN;
+	}
+	
+	// dir increments or decrements local target value
+	if(dir == Encoder::CLOCKWISE)
+		local_target_val += 0.1;
+	else if(dir == Encoder::COUNTERCLOCKWISE)
+		local_target_val -= 0.1;
+	
+	// go to LR mode screen if mode is off; otherwise remain on screen
+	if(mode == LoadRegulator::OFF){
+		// Re-enable getting local val before exiting
+		update_local_val = true;
+		// Disable using local op mode in case coming directly from main menu
+		use_local_op_mode = false;
+		return Screen::LR_MODE_SCREEN;
+	}else
+		return Screen::LR_VAL_SCREEN;
+}
+void LR_Val_Screen::update_op_mode(LoadRegulator::operation_mode mode){
+	// Used in LR mode screen
+	local_op_mode = mode;
+	use_local_op_mode = true;
+}
+LoadRegulator::operation_mode LR_Val_Screen::get_op_mode(){
+	return local_op_mode;
+}
+/********************* LR Mode screen *********************/
+LR_Mode_Screen::LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r, LR_Val_Screen &LR_Val_Screen_r):
+_LR_state(LR_state_r),
+_LR_Val_Screen(LR_Val_Screen_r)
 {
 	// Initialize data
 	row_offset = 0;
@@ -217,40 +356,42 @@ void LR_Mode_Screen::update_text(){
 Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
 	// Push to select mode
 	if(btn == Encoder::PUSH){
-		// Update load regulator mode
+		// Update local op mode in LR Val screen for non-OFF modes
 		switch(get_cursor()){
 			case(0):
-				// Cancel; do nothing
-				break;
+			// Cancel; do nothing
+			break;
 			case(1):
-				_LR_state._op_mode = LoadRegulator::CC;
+				_LR_Val_Screen.update_op_mode(LoadRegulator::CC);
 				break;
 			case(2):
-				_LR_state._op_mode = LoadRegulator::CP;
+				_LR_Val_Screen.update_op_mode(LoadRegulator::CP);
 				break;
 			case(3):
-				_LR_state._op_mode = LoadRegulator::CR;
+				_LR_Val_Screen.update_op_mode(LoadRegulator::CR);
 				break;
 			case(4):
-				_LR_state._op_mode = LoadRegulator::CV;
+				_LR_Val_Screen.update_op_mode(LoadRegulator::CV);
 				break;
 			case(5):
 				_LR_state._op_mode = LoadRegulator::OFF;
 				break;
 			default:
 				// Shouldn't be here; do nothing
-				break;	
+				break;
 		}
 		// If cancel was selected, do nothing; return to main menu
 		if(get_cursor() == 0)
 			return Screen::MAIN_MENU_SCREEN;
 		else{
-			// Enable update, then go to main menu if mode is off; otherwise go to LR Val screen
-			_LR_state._update = true;
-			if(_LR_state._op_mode == LoadRegulator::OFF)
+			// If OFF is selected, update and return to main menu. Otherwise go to LR Val screen
+			if(get_cursor() == 5){
+				_LR_state._update = true;
 				return Screen::MAIN_MENU_SCREEN;
-			else
+			}else{
+				_LR_state._update = false;
 				return Screen::LR_VAL_SCREEN;
+			}
 		}
 	}
 	
@@ -262,125 +403,12 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 	
 	// dir increments or decrements cursor row
 	if(dir == Encoder::CLOCKWISE)
-		increment_cursor();
+	increment_cursor();
 	else if(dir == Encoder::COUNTERCLOCKWISE)
-		decrement_cursor();
+	decrement_cursor();
 	
 	// don't change screens
 	return Screen::LR_MODE_SCREEN;
-}
-/********************* LR Val screen *********************/
-LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
-	_LR_state(LR_state_r)
-{
-	// Initialize data
-	row_offset = 0;
-	cursor_row = 1;
-	cursor_row_min = 1;
-	show_cursor = false;
-	number_of_rows = LR_VAL_SIZE;
-	update_local_val = true;
-	local_target_val = 0;
-	
-	strcpy(text[0], LR_VAL_LINE_0);
-	strcpy(text[1], LR_VAL_LINE_1);
-
-}
-void LR_Val_Screen::update_text(){
-	// Update local value if necessary
-	if(update_local_val){
-		// Update local value from actual target value
-		update_local_val = false;
-		switch(_LR_state._op_mode){
-			case(LoadRegulator::CC):
-				local_target_val = _LR_state._target_current;
-				break;
-			case(LoadRegulator::CP):
-				local_target_val = _LR_state._target_power;
-				break;
-			case(LoadRegulator::CR):
-				local_target_val = _LR_state._target_resistance;
-				break;
-			case(LoadRegulator::CV):
-				local_target_val = _LR_state._target_voltage;
-				break;
-			default:
-				// Shouldn't be here
-				local_target_val = 0;
-				break;
-		}
-	}
-	
-	// Update text to show local value
-	dtostrf(local_target_val, SET_UI_LOCAL_TARGET_WIDTH, SET_UI_LOCAL_TARGET_DECIMAL, text[1]);
-	switch(_LR_state._op_mode){
-		case(LoadRegulator::CC):
-			strcat(text[1], " A");
-			break;
-		case(LoadRegulator::CP):
-			strcat(text[1], " W");
-			break;
-		case(LoadRegulator::CR):
-			strcat(text[1], " R");
-			break;
-		case(LoadRegulator::CV):
-			strcat(text[1], " V");
-			break;
-		default:
-			// Shouldn't be here
-			strcat(text[1], "");
-			break;
-	}
-}
-Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
-	// Push to save value
-	if(btn == Encoder::PUSH){
-		// Write local to actual
-		switch(_LR_state._op_mode){
-			case(LoadRegulator::CC):
-				_LR_state._target_current = local_target_val;
-				break;
-			case(LoadRegulator::CP):
-				_LR_state._target_power = local_target_val;
-				break;
-			case(LoadRegulator::CR):
-				_LR_state._target_resistance = local_target_val;
-				break;
-			case(LoadRegulator::CV):
-				_LR_state._target_voltage = local_target_val;
-				break;
-			default:
-				// Do nothing for OFF
-				break;
-		}
-		// Re-enable getting local val before exiting
-		update_local_val = true;
-		// Enable update and return to main menu
-		_LR_state._update = true;
-		return Screen::MAIN_MENU_SCREEN;
-	}
-	
-	// Long push returns to VL screen
-	if(btn == Encoder::LONG_PUSH){
-		// Re-enable getting local val before exiting
-		update_local_val = true;
-		// Go to VL Screen
-		return Screen::VL_SCREEN;
-	}
-	
-	// dir increments or decrements local target value
-	if(dir == Encoder::CLOCKWISE)
-		local_target_val += 0.1;
-	else if(dir == Encoder::COUNTERCLOCKWISE)
-		local_target_val -= 0.1;
-	
-	// go to LR mode screen if mode is off; otherwise remain on screen
-	if(_LR_state._op_mode == LoadRegulator::OFF){
-		// Re-enable getting local val before exiting
-		update_local_val = true;
-		return Screen::LR_MODE_SCREEN;
-	}else
-		return Screen::LR_VAL_SCREEN;
 }
 /********************* TR Val screen *********************/
 TR_Val_Screen::TR_Val_Screen(TempRegulator::TR_state &TR_state_r):

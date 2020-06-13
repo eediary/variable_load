@@ -85,6 +85,23 @@ public:
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 
+/********************* LR Val screen *********************/
+#define LR_VAL_LINE_0 "Set target value:"
+#define LR_VAL_LINE_1 " 000.00 A"
+class LR_Val_Screen : public Screen{
+private:
+	bool update_local_val; // flag for copying target val to local variable
+	float local_target_val; // local variable that will be copied to target val
+	LoadRegulator::operation_mode local_op_mode; // op mode to use when updating
+	bool use_local_op_mode; // use local op mode if coming from LR Mode screen
+	virtual void update_text();
+	LoadRegulator::LR_state &_LR_state;
+public:
+	LR_Val_Screen(LoadRegulator::LR_state &LR_state_r);
+	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
+	void update_op_mode(LoadRegulator::operation_mode mode);
+	LoadRegulator::operation_mode get_op_mode();
+};
 /********************* LR Mode screen *********************/
 #define LR_MODE_LINE_0 " Cancel"
 #define LR_MODE_LINE_1 " CC"
@@ -93,24 +110,12 @@ public:
 #define LR_MODE_LINE_4 " CV"
 #define LR_MODE_LINE_5 " OFF"
 class LR_Mode_Screen : public Screen{
-private:
-	virtual void update_text();
+	private:
 	LoadRegulator::LR_state &_LR_state;
-public:
-	LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r);
-	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
-};
-/********************* LR Val screen *********************/
-#define LR_VAL_LINE_0 "Set target value:"
-#define LR_VAL_LINE_1 " 000.00 A"
-class LR_Val_Screen : public Screen{
-private:
-	bool update_local_val; // flag for copying target val to local variable
-	float local_target_val; // local variable that will be copied to target val
+	LR_Val_Screen &_LR_Val_Screen;
 	virtual void update_text();
-	LoadRegulator::LR_state &_LR_state;
-public:
-	LR_Val_Screen(LoadRegulator::LR_state &LR_state_r);
+	public:
+	LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r, LR_Val_Screen &LR_Val_Screen_r);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 /********************* TR Val screen *********************/

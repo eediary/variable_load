@@ -8,7 +8,7 @@ User_Interface::User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulato
 	Lcd(SCH_UI_LCD_ADDR),
 	VL_screen(_LR_state, _TR_state),
 	Main_menu_screen(),
-	LR_Mode_screen(_LR_state),
+	LR_Mode_screen(_LR_state, LR_Val_screen),
 	LR_Val_screen(_LR_state),
 	TR_Val_screen(_TR_state),
 	Info_screen()
