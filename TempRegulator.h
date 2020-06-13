@@ -17,6 +17,7 @@ struct TR_state{
 	
 	// Read only
 	float _temp_volt;
+	float _temp;
 };
 
 private:
@@ -28,6 +29,7 @@ HAL_PWM Pwm;
 // Data
 bool enable;
 float temp_volt; // ADC reading of temp, in volts
+float temperature; // temperature, in celsius
 int duty_cycle; // duty cycle of PWM output
 unsigned long last_time; // last time run, in ms
 
@@ -60,6 +62,7 @@ void get_state(TR_state &state){
 	state._duty_cycle = duty_cycle;
 	state._update = false;
 	state._temp_volt = temp_volt;
+	state._temp = temperature;
 }
 void set_state(TR_state &state){
 	// Allows quick configuration of info
@@ -70,6 +73,6 @@ void set_state(TR_state &state){
 		duty_cycle = state._duty_cycle;
 	}
 	
-	// don't update t_volt
+	// don't update temp_volt or temperature
 }
 };

@@ -110,10 +110,10 @@ void VL_Screen::update_text(){
 			strcpy(text[3], "OFF");
 			break;
 	}
-	// Update duty cycle
-	strcat(text[3], "            ");
-	itoa(_TR_state._duty_cycle, text[3]+15, 10);
-	strcat(text[3], "%");
+	// Update temperature
+	strcat(text[3], "          ");
+	dtostrf(_TR_state._temp, SET_UI_TEMP_WIDTH, SET_UI_TEMP_DECIMAL, text[3]+13);
+	strcat(text[3], " C");
 }
 Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
 	// Push toggle output enable

@@ -73,7 +73,11 @@
 #define SCH_TR_ADC_MASK (0b0000000000000010) // disable ADC1 digital input buffer
 #define SCH_TR_ADC_TO_VOLT(C) (C * SCH_TR_ADC_REF_VOLT / (1 << SCH_TR_ADC_RESOLUTION))
 #define SCH_TR_ADC_TEMP_MUX (HAL_ADC::ADC_ADC1) // temp ADC input on ADC 1
-#define SCH_TR_VOLT_TO_TEMP(V) (V * 1.0 + 0) // converts voltage to temperature
+#define SCH_TR_VOLT_TO_TEMP(V) (SCH_TR_VOLT_TO_TEMP_2(V)) // converts voltage to temperature
+#define SCH_TR_VOLT_TO_TEMP_1(V) (20.053 * V - 7.9606) // first order eqn
+#define SCH_TR_VOLT_TO_TEMP_2(V) (3.4576 * V*V + 3.2644 * V + 5.0232) // second order eqn
+#define SCH_TR_VOLT_TO_TEMP_3(V) (1.584 * V*V*V - 7.8637 * V*V + 24.41 * V - 2.0054) // third order eqn
+
 
 // PWM
 // Fan is expecting PWM frequency around 25 kHz

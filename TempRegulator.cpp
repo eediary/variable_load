@@ -15,6 +15,7 @@ void TempRegulator::regulate(){
 	if(Timer.get_tick() - last_time > SET_TR_PERIOD){
 		last_time = Timer.get_tick();
 		temp_volt = SCH_TR_ADC_TO_VOLT(Adc.read(SCH_TR_ADC_TEMP_MUX));
+		temperature = SCH_TR_VOLT_TO_TEMP(temp_volt);
 		if(enable)
 			// duty cycle depends on temperature
 			duty_cycle = Pwm.set_duty_cycle(SET_TR_VOLT_TO_DUTY_CYCLE(temp_volt));
