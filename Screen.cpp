@@ -79,41 +79,94 @@ VL_Screen::VL_Screen(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_stat
 	strcpy(text[3], VL_SCREEN_LINE_3);
 	
 }
+void VL_Screen::res_to_text(float val, char* dest, int width, int prec){
+	// Writes val to dest as text, with appropriate units and formatting
+	// Reduce va as necessary
+	int res_units_index = 0;
+	char *res_units[3] = { "  R", " kR", " MR"};
+	res_units[0][2] = OHM_ICON; // replace R with ?
+	res_units[1][2] = OHM_ICON;
+	res_units[2][2] = OHM_ICON;
+	if(val > 1E6){
+		// In mega ohm range
+		val /= 1E6;
+		res_units_index = 2;
+		} else if(val > 1E3){
+		// In kilo ohm range
+		val /= 1E3;
+		res_units_index = 1;
+		} else{
+		// In ohm range
+		// do nothing
+	}
+	dtostrf(val, width, prec, dest);
+	strcat(dest, res_units[res_units_index]);
+}
 void VL_Screen::update_text(){
 	// Update voltage, current, power, mode of variable load
-	// Update Duty cycle of fan
-	// Update measured voltage
-	dtostrf(_LR_state._measured_voltage, SET_UI_MEASURED_VOLT_WIDTH, SET_UI_MEASURED_VOLT_DECIMAL, text[0]);
-	strcat(text[0], " V");
-	// Update measured current
-	dtostrf(_LR_state._measured_current, SET_UI_MEASURED_CURR_WIDTH, SET_UI_MEASURED_CURR_DECIMAL, text[1]);
-	strcat(text[1], " A");
-	// Update measured power
-	float measured_power = _LR_state._measured_voltage * _LR_state._measured_current;
-	dtostrf(measured_power, SET_UI_MEASURED_POW_WIDTH, SET_UI_MEASURED_POW_DECIMAL, text[2]);
-	strcat(text[2], " W");
+	// Update load temperature
+	
+	// temp buffer to store strings
+	char temp_buffer[SCH_UI_LCD_COLS];
+	
+	// Limit display voltage, current, power and resistance to non-negative numbers
+	float display_voltage = (_LR_state._measured_voltage < 0) ? 0 : _LR_state._measured_voltage;
+	float display_current = (_LR_state._measured_current < 0) ? 0 : _LR_state._measured_current;
+	float display_power = display_voltage * display_current;
+	float display_resistance = display_voltage / display_current;
+	
+	// Line 1: display voltage and power
+	dtostrf(display_voltage, SET_UI_MEASURED_VOLT_WIDTH, SET_UI_MEASURED_VOLT_DECIMAL, text[0]);
+	strcat(text[0], " V  ");
+	dtostrf(display_power, SET_UI_MEASURED_POW_WIDTH, SET_UI_MEASURED_POW_DECIMAL, temp_buffer);
+	strcat(temp_buffer, "  W");
+	strcat(text[0], temp_buffer);
+	
+	// Line 2: display current and resistance
+	dtostrf(display_current, SET_UI_MEASURED_CURR_WIDTH, SET_UI_MEASURED_CURR_DECIMAL, text[1]);
+	strcat(text[1], " A     ");
+	res_to_text(display_resistance, temp_buffer, SET_UI_MEASURED_RES_WIDTH, SET_UI_MEASURED_RES_DECIMAL);
+	strcat(text[1], temp_buffer);
+	
+	// Line 3: display mode and target value
 	// Update mode
 	switch(_LR_state._op_mode){
 		case(LoadRegulator::CC):
-			strcpy(text[3], "CC ");
+			strcpy(text[2], "CC: ");
+			dtostrf(_LR_state._target_current, SET_UI_TARGET_CURR_WIDTH, SET_UI_TARGET_CURR_DECIMAL, temp_buffer);
+			strcat(text[2], temp_buffer);
+			strcat(text[2], " A");
 			break;
 		case(LoadRegulator::CP):
-			strcpy(text[3], "CP ");
+			strcpy(text[2], "CP: ");
+			dtostrf(_LR_state._target_power, SET_UI_TARGET_POW_WIDTH, SET_UI_TARGET_POW_DECIMAL, temp_buffer);
+			strcat(text[2], temp_buffer);
+			strcat(text[2], " W");
 			break;
 		case(LoadRegulator::CR):
-			strcpy(text[3], "CR ");
+			strcpy(text[2], "CR: ");
+			res_to_text(_LR_state._target_resistance, temp_buffer, SET_UI_TARGET_RES_WIDTH, SET_UI_TARGET_RES_DECIMAL);
+			strcat(text[2], temp_buffer);
 			break;
 		case(LoadRegulator::CV):
-			strcpy(text[3], "CV ");
+			strcpy(text[2], "CV: ");
+			dtostrf(_LR_state._target_voltage, SET_UI_TARGET_VOLT_WIDTH, SET_UI_TARGET_VOLT_DECIMAL, temp_buffer);
+			strcat(text[2], temp_buffer);
+			strcat(text[2], " V");
 			break;
 		case(LoadRegulator::OFF):
-			strcpy(text[3], "OFF");
+			strcpy(text[2], "OFF");
 			break;
 	}
-	// Update temperature
-	strcat(text[3], "          ");
-	dtostrf(_TR_state._temp, SET_UI_TEMP_WIDTH, SET_UI_TEMP_DECIMAL, text[3]+13);
-	strcat(text[3], " C");
+	
+	// Line 4: display temperature and duty cycle
+	dtostrf(_TR_state._temp, SET_UI_TEMP_WIDTH, SET_UI_TEMP_DECIMAL, text[3]);
+	strcat(text[3], "  C      ");
+	text[3][SET_UI_TEMP_WIDTH + 1] = DEG_ICON;
+	strcat(text[3], "Fan: ");
+	itoa(_TR_state._duty_cycle, temp_buffer, 10);
+	strcat(text[3], temp_buffer);
+	strcat(text[3], " %");
 }
 Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
 	// Push toggle output enable

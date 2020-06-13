@@ -15,6 +15,8 @@
 // Special characters & lines
 #define BLANK_LINE "                    "
 #define CURSOR_ICON (0x7E)
+#define OHM_ICON (0xF4)
+#define DEG_ICON (0xDF)
 
 // Screen sizes
 #define VL_SIZE (4)
@@ -63,6 +65,7 @@ public:
 #define VL_SCREEN_LINE_3 "OFF             000%"
 class VL_Screen : public Screen{
 	private:
+		void res_to_text(float val, char* dest, int width, int prec);
 		virtual void update_text();
 		LoadRegulator::LR_state &_LR_state;
 		TempRegulator::TR_state &_TR_state;
