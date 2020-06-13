@@ -161,10 +161,13 @@ void VL_Screen::update_text(){
 	
 	// Line 4: display temperature and duty cycle
 	dtostrf(_TR_state._temp, SET_UI_TEMP_WIDTH, SET_UI_TEMP_DECIMAL, text[3]);
-	strcat(text[3], "  C      ");
+	strcat(text[3], "  C     ");
 	text[3][SET_UI_TEMP_WIDTH + 1] = DEG_ICON;
-	strcat(text[3], "Fan: ");
-	itoa(_TR_state._duty_cycle, temp_buffer, 10);
+	if(_TR_state._enable)
+		strcat(text[3], "A: ");
+	else
+		strcat(text[3], "M: ");
+	dtostrf(_TR_state._duty_cycle, 3, 0, temp_buffer);
 	strcat(text[3], temp_buffer);
 	strcat(text[3], " %");
 }
