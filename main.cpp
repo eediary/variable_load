@@ -5,11 +5,12 @@
  * Author : jaekyung
  */ 
 
-// AVR headers
-#include <avr/interrupt.h>
 // Project headers
 #include "schematic.h"
 #include "settings.h"
+// AVR headers
+#include <avr/interrupt.h>
+#include <util/delay.h>
 // HAL headers
 #include "HAL_Timer.h"
 // Module headers
@@ -19,7 +20,7 @@
 #include "User_Interface.h"
 
 int main(void)
-{		
+{
 	// Main Timer constructor
 	HAL_Timer MainTimer = HAL_Timer(SET_MAIN_TIMER_NUMBER, SET_MAIN_TIMER_DIV, SET_MAIN_TIMER_TOP);
 	MainTimer.enable_int();
@@ -43,6 +44,10 @@ int main(void)
 	#if DEBUG == 1
 	Debugger DebuggerModule = Debugger(LoadReg, TempReg, MainTimer);
 	#endif
+	
+	// Recal zero after delay
+	_delay_ms(SET_CAL_DELAY);
+	LoadReg.calibrate_zero();
 	
 	// Enable global interrupt
 	sei();
