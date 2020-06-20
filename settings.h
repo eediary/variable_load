@@ -3,7 +3,7 @@
 
 /********************* MAIN *********************/
 // Set to 1 ms
-#define SET_MAIN_TIMER_NUMBER (HAL_Timer::TIMER_TIMER1)
+#define SET_MAIN_TIMER_NUMBER (HAL_Timer::TIMER_TIMER3)
 #define SET_MAIN_TIMER_DIV (HAL_Timer::TIMER_CLK_DIV64)
 #define SET_MAIN_TIMER_TOP (249)
 // Start-up delay
