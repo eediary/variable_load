@@ -22,7 +22,7 @@
 #define VL_SIZE (4)
 #define MAIN_MENU_SIZE (5)
 #define LR_MODE_SIZE (6)
-#define LR_VAL_SIZE (2)
+#define LR_VAL_SIZE (3)
 #define TR_VAL_SIZE (2)
 #define INFO_SIZE (3)
 
@@ -89,12 +89,17 @@ public:
 };
 
 /********************* LR Val screen *********************/
-#define LR_VAL_LINE_0 "Set target value:"
-#define LR_VAL_LINE_1 " 000.00 A"
+#define LR_VAL_LINE_0_A "Select digit:"
+#define LR_VAL_LINE_0_B "Modify digit:"
+#define LR_VAL_LINE_1 "0000.00 A        END"
+#define LR_VAL_LINE_2 (BLANK_LINE)
+#define LR_VAL_END_OFFSET (17)
 class LR_Val_Screen : public Screen{
 private:
 	bool update_local_val; // flag for copying target val to local variable
 	float local_target_val; // local variable that will be copied to target val
+	int digit_index; // indicates which digit is selected
+	bool select_digit; // true if selecting digit, false if modifying digit
 	LoadRegulator::operation_mode local_op_mode; // op mode to use when updating
 	bool use_local_op_mode; // use local op mode if coming from LR Mode screen
 	virtual void update_text();

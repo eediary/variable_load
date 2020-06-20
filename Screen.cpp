@@ -271,9 +271,12 @@ LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
 	update_local_val = true;
 	local_target_val = 0;
 	use_local_op_mode = false;
+	digit_index = 0;
+	select_digit = true;
 	
-	strcpy(text[0], LR_VAL_LINE_0);
+	strcpy(text[0], LR_VAL_LINE_0_A);
 	strcpy(text[1], LR_VAL_LINE_1);
+	strcpy(text[2], LR_VAL_LINE_2);
 
 }
 void LR_Val_Screen::update_text(){
@@ -304,62 +307,88 @@ void LR_Val_Screen::update_text(){
 		}
 	}
 	
+	// Update header
+	if(select_digit){
+		// in select digit mode
+		strcpy(text[0], LR_VAL_LINE_0_A);
+	} else{
+		// in modify digit mode
+		strcpy(text[0], LR_VAL_LINE_0_B);
+	}
 	// Update text to show local value
 	dtostrf(local_target_val, SET_UI_LOCAL_TARGET_WIDTH, SET_UI_LOCAL_TARGET_DECIMAL, text[1]);
 	switch(mode){
 		case(LoadRegulator::CC):
-			strcat(text[1], " A");
+			strcat(text[1], " A        END");
 			break;
 		case(LoadRegulator::CP):
-			strcat(text[1], " W");
+			strcat(text[1], " W        END");
 			break;
 		case(LoadRegulator::CR):
-			strcat(text[1], " R");
+			strcat(text[1], " R        END");
 			break;
 		case(LoadRegulator::CV):
-			strcat(text[1], " V");
+			strcat(text[1], " V        END");
 			break;
 		default:
 			// Shouldn't be here
 			strcat(text[1], "");
 			break;
 	}
+	
+	// Display which digit is currently selected
+	strcpy(text[2], BLANK_LINE);
+	if(digit_index == SET_UI_LOCAL_TARGET_WIDTH)
+		// Set cursor on END
+		text[2][LR_VAL_END_OFFSET] = '^';
+	else
+		// Display cursor on digit
+		text[2][digit_index] = '^';
 }
 Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
 	// use local op mode if coming from LR mode screen, or actual op mode if coming from main menu
 	LoadRegulator::operation_mode mode = (use_local_op_mode) ? local_op_mode : _LR_state._op_mode;
 	
-	// Push to save value
+	// Push to switch modes or save value
 	if(btn == Encoder::PUSH){
-		// Use either local or actual op mode
-		switch(mode){
-			case(LoadRegulator::CC):
-				_LR_state._target_current = local_target_val;
-				_LR_state._op_mode = LoadRegulator::CC;
-				break;
-			case(LoadRegulator::CP):
-				_LR_state._target_power = local_target_val;
-				_LR_state._op_mode = LoadRegulator::CP;
-				break;
-			case(LoadRegulator::CR):
-				_LR_state._target_resistance = local_target_val;
-				_LR_state._op_mode = LoadRegulator::CR;
-				break;
-			case(LoadRegulator::CV):
-				_LR_state._target_voltage = local_target_val;
-				_LR_state._op_mode = LoadRegulator::CV;
-				break;
-			default:
-				// Do nothing for OFF
-				break;
+		if(digit_index == SET_UI_LOCAL_TARGET_WIDTH){
+			// cursor on END, so save value
+			// Use either local or actual op mode
+			switch(mode){
+				case(LoadRegulator::CC):
+					_LR_state._target_current = local_target_val;
+					_LR_state._op_mode = LoadRegulator::CC;
+					break;
+				case(LoadRegulator::CP):
+					_LR_state._target_power = local_target_val;
+					_LR_state._op_mode = LoadRegulator::CP;
+					break;
+				case(LoadRegulator::CR):
+					_LR_state._target_resistance = local_target_val;
+					_LR_state._op_mode = LoadRegulator::CR;
+					break;
+				case(LoadRegulator::CV):
+					_LR_state._target_voltage = local_target_val;
+					_LR_state._op_mode = LoadRegulator::CV;
+					break;
+				default:
+					// Do nothing for OFF
+					break;
+			}
+			// Re-enable getting local val before exiting
+			update_local_val = true;
+			// Disable using local op mode in case coming directly from main menu
+			use_local_op_mode = false;
+			// Enable update and return to main menu
+			_LR_state._update = true;
+			// Reset cursor and digit selection
+			digit_index = 0;
+			select_digit = true;
+			return Screen::MAIN_MENU_SCREEN;
+		} else{
+			// Since not at END, switch between selecting and modifying digit
+			select_digit = !select_digit;
 		}
-		// Re-enable getting local val before exiting
-		update_local_val = true;
-		// Disable using local op mode in case coming directly from main menu
-		use_local_op_mode = false;
-		// Enable update and return to main menu
-		_LR_state._update = true;
-		return Screen::MAIN_MENU_SCREEN;
 	}
 	
 	// Long push returns to VL screen
@@ -372,11 +401,45 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 		return Screen::VL_SCREEN;
 	}
 	
-	// dir increments or decrements local target value
-	if(dir == Encoder::CLOCKWISE)
-		local_target_val += 0.1;
-	else if(dir == Encoder::COUNTERCLOCKWISE)
-		local_target_val -= 0.1;
+	// dir increments or decrements cursor in select digit
+	// dir increments or decrements digit in modify digit
+	if(select_digit){
+		// In select digit mode; allows user to move cursor
+		if(dir == Encoder::CLOCKWISE)
+			digit_index++;
+		else if(dir == Encoder::COUNTERCLOCKWISE)
+			digit_index--;
+		// skip decimal
+		if(digit_index == SET_UI_LOCAL_TARGET_WIDTH - SET_UI_LOCAL_TARGET_DECIMAL - 1){
+			if(dir == Encoder::CLOCKWISE)
+				digit_index++;
+			else if(dir == Encoder::COUNTERCLOCKWISE)
+				digit_index--;
+		}
+		// limit cursor
+		if(digit_index < 0)
+			digit_index = 0;
+		else if(digit_index > SET_UI_LOCAL_TARGET_WIDTH)
+			digit_index = SET_UI_LOCAL_TARGET_WIDTH;
+	} else{
+		// In modify digit mode; modify local val
+		// local val is increased by 10^x, where x depends on location of cursor
+		// calculate x when cursor is left of decimal point
+		int exponent = SET_UI_LOCAL_TARGET_WIDTH - SET_UI_LOCAL_TARGET_DECIMAL - 2 - digit_index;
+		// adjust x for when cursor is right of decimal point
+		if(digit_index >= SET_UI_LOCAL_TARGET_WIDTH - SET_UI_LOCAL_TARGET_DECIMAL - 1)
+			exponent += 1;
+		// calculate 10^x
+		float multiplier = pow(10,exponent);
+		// adjust value
+		if(dir == Encoder::CLOCKWISE)
+			local_target_val += multiplier;
+		else if(dir == Encoder::COUNTERCLOCKWISE)
+			local_target_val -= multiplier;
+		// make sure value is non-negative
+		if(local_target_val < 0)
+			local_target_val = 0;
+	}
 	
 	// go to LR mode screen if mode is off; otherwise remain on screen
 	if(mode == LoadRegulator::OFF){
