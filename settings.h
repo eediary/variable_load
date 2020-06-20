@@ -19,14 +19,18 @@
 #define SET_LR_CUR_ERROR_SCALER (0.5)
 // Zero current calibration amount
 #define SET_LR_CAL_AMOUNT (10)
-// CP initial power
+// Target max values
+#define SET_LR_CUR_MAX (10) // in amps
+#define SET_LR_POW_MAX (100) // in watts
+#define SET_LR_RES_MAX (999.99) // in ohms
+#define SET_LR_VOLT_MAX (30) // in volts
+// Initial target values
+#define SET_LR_INIT_CUR (0) // in amps
 #define SET_LR_INIT_POW (0) // in watts
-// CR initial resistance
-#define SET_LR_INIT_RES (1000) // in ohms
+#define SET_LR_INIT_RES (SET_LR_RES_MAX) // in ohms
+#define SET_LR_INIT_V (SET_LR_VOLT_MAX) // in volts
 // CV current step size
-#define SET_LR_CV_CUR_STEP (0.001) // in mA
-// CV initial voltage
-#define SET_LR_CV_INIT_V (100) // in V
+#define SET_LR_CV_CUR_STEP (0.001) // in amps
 // Current sampling period
 #define SET_LR_CUR_SAMPLE_PERIOD (17) // in ms
 
@@ -68,6 +72,7 @@
 // Screen
 #define SET_UI_SCREEN_MAX_LINES (8)
 // Formatting
+	// formatting for measured values
 #define SET_UI_MEASURED_VOLT_WIDTH 6
 #define SET_UI_MEASURED_VOLT_DECIMAL 2
 #define SET_UI_MEASURED_CURR_WIDTH 6
@@ -76,7 +81,7 @@
 #define SET_UI_MEASURED_POW_DECIMAL 2
 #define SET_UI_MEASURED_RES_WIDTH 3
 #define SET_UI_MEASURED_RES_DECIMAL 0
-
+	// formatting for target values
 #define SET_UI_TARGET_VOLT_WIDTH 6
 #define SET_UI_TARGET_VOLT_DECIMAL 2
 #define SET_UI_TARGET_CURR_WIDTH 6
@@ -85,9 +90,15 @@
 #define SET_UI_TARGET_POW_DECIMAL 2
 #define SET_UI_TARGET_RES_WIDTH 3
 #define SET_UI_TARGET_RES_DECIMAL 0
-
-#define SET_UI_LOCAL_TARGET_WIDTH 7
-#define SET_UI_LOCAL_TARGET_DECIMAL 2
-
+	// formatting for local values
+#define SET_UI_LOCAL_TARGET_CUR_WIDTH 5
+#define SET_UI_LOCAL_TARGET_CUR_DECIMAL 2
+#define SET_UI_LOCAL_TARGET_POW_WIDTH 6
+#define SET_UI_LOCAL_TARGET_POW_DECIMAL 2
+#define SET_UI_LOCAL_TARGET_RES_WIDTH 6
+#define SET_UI_LOCAL_TARGET_RES_DECIMAL 2
+#define SET_UI_LOCAL_TARGET_VOLT_WIDTH 5
+#define SET_UI_LOCAL_TARGET_VOLT_DECIMAL 2
+	// formatting for temp values
 #define SET_UI_TEMP_WIDTH 3
 #define SET_UI_TEMP_DECIMAL 0

@@ -20,14 +20,14 @@ LoadRegulator::LoadRegulator():
 	// Set initial resistance and voltage values
 	target_power = SET_LR_INIT_POW;
 	target_resistance = SET_LR_INIT_RES;
-	target_voltage = SET_LR_CV_INIT_V;
+	target_voltage = SET_LR_INIT_V;
 	
 	// Puts load regulator into innocuous state
 	// Calibrates zero
 	last_cur_time = 0;
 	set_mode(OFF);
 	regulate();
-	set_target_current(0);
+	set_target_current(SET_LR_INIT_CUR);
 	calibrate_zero();
 }
 void LoadRegulator::regulate(){

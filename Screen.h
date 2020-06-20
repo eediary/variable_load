@@ -100,6 +100,9 @@ private:
 	float local_target_val; // local variable that will be copied to target val
 	int digit_index; // indicates which digit is selected
 	bool select_digit; // true if selecting digit, false if modifying digit
+	int display_width; // number of digits for display
+	int display_dec; // number of digits for decimal
+	float local_val_max; // max allowed value for local val
 	LoadRegulator::operation_mode local_op_mode; // op mode to use when updating
 	bool use_local_op_mode; // use local op mode if coming from LR Mode screen
 	virtual void update_text();

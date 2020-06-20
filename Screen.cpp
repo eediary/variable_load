@@ -273,6 +273,9 @@ LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
 	use_local_op_mode = false;
 	digit_index = 0;
 	select_digit = true;
+	display_width = SET_UI_TARGET_CURR_WIDTH;
+	display_dec = SET_UI_TARGET_CURR_DECIMAL;
+	local_val_max = SET_LR_CUR_MAX;
 	
 	strcpy(text[0], LR_VAL_LINE_0_A);
 	strcpy(text[1], LR_VAL_LINE_1);
@@ -290,15 +293,27 @@ void LR_Val_Screen::update_text(){
 		switch(mode){
 			case(LoadRegulator::CC):
 				local_target_val = _LR_state._target_current;
+				display_width = SET_UI_LOCAL_TARGET_CUR_WIDTH;
+				display_dec = SET_UI_LOCAL_TARGET_CUR_DECIMAL;
+				local_val_max = SET_LR_CUR_MAX;
 				break;
 			case(LoadRegulator::CP):
 				local_target_val = _LR_state._target_power;
+				display_width = SET_UI_LOCAL_TARGET_POW_WIDTH;
+				display_dec = SET_UI_LOCAL_TARGET_POW_DECIMAL;
+				local_val_max = SET_LR_POW_MAX;
 				break;
 			case(LoadRegulator::CR):
 				local_target_val = _LR_state._target_resistance;
+				display_width = SET_UI_LOCAL_TARGET_RES_WIDTH;
+				display_dec = SET_UI_LOCAL_TARGET_RES_DECIMAL;
+				local_val_max = SET_LR_RES_MAX;
 				break;
 			case(LoadRegulator::CV):
 				local_target_val = _LR_state._target_voltage;
+				display_width = SET_UI_LOCAL_TARGET_VOLT_WIDTH;
+				display_dec = SET_UI_LOCAL_TARGET_VOLT_DECIMAL;
+				local_val_max = SET_LR_VOLT_MAX;
 				break;
 			default:
 				// Shouldn't be here
@@ -316,7 +331,7 @@ void LR_Val_Screen::update_text(){
 		strcpy(text[0], LR_VAL_LINE_0_B);
 	}
 	// Update text to show local value
-	dtostrf(local_target_val, SET_UI_LOCAL_TARGET_WIDTH, SET_UI_LOCAL_TARGET_DECIMAL, text[1]);
+	dtostrf(local_target_val, display_width, display_dec, text[1]);
 	switch(mode){
 		case(LoadRegulator::CC):
 			strcat(text[1], " A        END");
@@ -338,7 +353,7 @@ void LR_Val_Screen::update_text(){
 	
 	// Display which digit is currently selected
 	strcpy(text[2], BLANK_LINE);
-	if(digit_index == SET_UI_LOCAL_TARGET_WIDTH)
+	if(digit_index == display_width)
 		// Set cursor on END
 		text[2][LR_VAL_END_OFFSET] = '^';
 	else
@@ -351,7 +366,7 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 	
 	// Push to switch modes or save value
 	if(btn == Encoder::PUSH){
-		if(digit_index == SET_UI_LOCAL_TARGET_WIDTH){
+		if(digit_index == display_width){
 			// cursor on END, so save value
 			// Use either local or actual op mode
 			switch(mode){
@@ -410,7 +425,7 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 		else if(dir == Encoder::COUNTERCLOCKWISE)
 			digit_index--;
 		// skip decimal
-		if(digit_index == SET_UI_LOCAL_TARGET_WIDTH - SET_UI_LOCAL_TARGET_DECIMAL - 1){
+		if(digit_index == display_width - display_dec - 1){
 			if(dir == Encoder::CLOCKWISE)
 				digit_index++;
 			else if(dir == Encoder::COUNTERCLOCKWISE)
@@ -419,15 +434,15 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 		// limit cursor
 		if(digit_index < 0)
 			digit_index = 0;
-		else if(digit_index > SET_UI_LOCAL_TARGET_WIDTH)
-			digit_index = SET_UI_LOCAL_TARGET_WIDTH;
+		else if(digit_index > display_width)
+			digit_index = display_width;
 	} else{
 		// In modify digit mode; modify local val
 		// local val is increased by 10^x, where x depends on location of cursor
 		// calculate x when cursor is left of decimal point
-		int exponent = SET_UI_LOCAL_TARGET_WIDTH - SET_UI_LOCAL_TARGET_DECIMAL - 2 - digit_index;
+		int exponent = display_width - display_dec - 2 - digit_index;
 		// adjust x for when cursor is right of decimal point
-		if(digit_index >= SET_UI_LOCAL_TARGET_WIDTH - SET_UI_LOCAL_TARGET_DECIMAL - 1)
+		if(digit_index >= display_width - display_dec - 1)
 			exponent += 1;
 		// calculate 10^x
 		float multiplier = pow(10,exponent);
@@ -436,9 +451,11 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 			local_target_val += multiplier;
 		else if(dir == Encoder::COUNTERCLOCKWISE)
 			local_target_val -= multiplier;
-		// make sure value is non-negative
+		// limit local target val
 		if(local_target_val < 0)
 			local_target_val = 0;
+		else if(local_target_val > local_val_max)
+			local_target_val = local_val_max;
 	}
 	
 	// go to LR mode screen if mode is off; otherwise remain on screen
