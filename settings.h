@@ -19,6 +19,8 @@
 #define SET_LR_CUR_ERROR_SCALER (0.5)
 // Zero current calibration amount
 #define SET_LR_CAL_AMOUNT (10)
+// CP initial power
+#define SET_LR_INIT_POW (0) // in watts
 // CR initial resistance
 #define SET_LR_INIT_RES (1000) // in ohms
 // CV current step size

@@ -18,6 +18,7 @@ LoadRegulator::LoadRegulator():
 	volt_monitor.set_input_range(SCH_ADS8685_RANGE, SCH_ADS8685_REF);
 	
 	// Set initial resistance and voltage values
+	target_power = SET_LR_INIT_POW;
 	target_resistance = SET_LR_INIT_RES;
 	target_voltage = SET_LR_CV_INIT_V;
 	
