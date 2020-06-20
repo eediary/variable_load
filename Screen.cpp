@@ -83,7 +83,7 @@ void VL_Screen::res_to_text(float val, char* dest, int width, int prec){
 	// Writes val to dest as text, with appropriate units and formatting
 	// Reduce va as necessary
 	int res_units_index = 0;
-	char *res_units[3] = { "  R", " kR", " MR"};
+	char res_units[3][4] = { "  R", " kR", " MR"};
 	res_units[0][2] = OHM_ICON; // replace R with ?
 	res_units[1][2] = OHM_ICON;
 	res_units[2][2] = OHM_ICON;
