@@ -334,16 +334,16 @@ void LR_Val_Screen::update_text(){
 	dtostrf(local_target_val, display_width, display_dec, text[1]);
 	switch(mode){
 		case(LoadRegulator::CC):
-			strcat(text[1], " A        END");
+			strcat(text[1], " A          END");
 			break;
 		case(LoadRegulator::CP):
-			strcat(text[1], " W        END");
+			strcat(text[1], " W         END");
 			break;
 		case(LoadRegulator::CR):
-			strcat(text[1], " R        END");
+			strcat(text[1], " R         END");
 			break;
 		case(LoadRegulator::CV):
-			strcat(text[1], " V        END");
+			strcat(text[1], " V          END");
 			break;
 		default:
 			// Shouldn't be here
