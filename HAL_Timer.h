@@ -7,12 +7,22 @@ Equation for frequency of interrupt occurrences is:
     F = F_IO / (N * (1 + OCRNA))
 F_IO is frequency of IO clock
 N is prescaler / divider (1, 8, 64, 256 or 1024)
-OCRNA is value in OCRNA register (0 ~ 255)
+OCRNA is value in OCRNA register (0 ~ 65535)
 At 16 MHz F_IO, interrupt frequency is 0.238 Hz to 16 MHz
     T = N / F_IO * (1 + OCRNA)
     OCRNA = T * F_IO / N - 1
 T is time between interrupt occurrences
 Equations above are rewritten forms of first equation
+
+Commonly used configurations (for F_IO = 16 MHz):
+  Time 		Freq 		Divider 	Top
+- 1 us 		1 MHz 		1			15
+- 10 us		100 kHz 	8			1
+- 100 us	10 kHz 		64			24
+- 1 ms		1 kHz 		64			249
+- 10 ms		100 Hz 		256			624
+- 100 ms	10 Hz 		246			6249
+- 1 s		1 Hz 		1024		15624
 */
 
 class HAL_Timer{
