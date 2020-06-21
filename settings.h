@@ -8,6 +8,8 @@
 #define SET_MAIN_TIMER_TOP (249)
 // Start-up delay
 #define SET_CAL_DELAY (10) // in ms
+// Temperature fail-safe
+#define SET_MAX_TEMP_VOLT (SCH_THERM_95C_VOLT)
 
 /********************* LOAD REGULATOR *********************/
 // Load Regulator sampling frequency

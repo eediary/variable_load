@@ -64,6 +64,13 @@ int main(void)
 		// Run user interface
 		UI.update_screen();
 		
+		// Fail-safe
+		if(TR_state_var._temp_volt >= SET_MAX_TEMP_VOLT){
+			// Load is too hot; disable load regulator
+			LR_state_var._op_mode = LoadRegulator::OFF;
+			LR_state_var._update = true;
+		}
+		
 		// Update regulators
 		LoadReg.set_state(LR_state_var);
 		TempReg.set_state(TR_state_var);
