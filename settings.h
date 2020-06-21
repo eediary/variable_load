@@ -10,6 +10,8 @@
 #define SET_CAL_DELAY (10) // in ms
 // Temperature fail-safe
 #define SET_MAX_TEMP_VOLT (SCH_THERM_95C_VOLT)
+// Power down mode
+#define SET_SLEEP_MODE (SLEEP_MODE_IDLE)
 
 /********************* LOAD REGULATOR *********************/
 // Load Regulator sampling frequency

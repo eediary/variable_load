@@ -10,6 +10,7 @@
 #include "settings.h"
 // AVR headers
 #include <avr/interrupt.h>
+#include <avr/sleep.h>
 #include <util/delay.h>
 // HAL headers
 #include "HAL_Timer.h"
@@ -49,6 +50,9 @@ int main(void)
 	_delay_ms(SET_CAL_DELAY);
 	LoadReg.calibrate_zero();
 	
+	// Configure sleep mode
+	set_sleep_mode(SET_SLEEP_MODE);
+	
 	// Enable global interrupt
 	sei();
     while (1) 
@@ -79,6 +83,16 @@ int main(void)
 		#if DEBUG == 1
 		DebuggerModule.run_debugger();
 		#endif
+		
+		// Sleep until interrupt occurs
+		cli();
+		sleep_enable();
+		sei();
+		sleep_cpu();
+		// Interrupt has occurred; wake up CPU
+		sleep_disable();
+		sei();
+		
 		
     }
 }
