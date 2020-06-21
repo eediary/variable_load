@@ -7,7 +7,7 @@ TempRegulator::TempRegulator(HAL_Timer &Timer_r):
 {
 	last_time = 0;
 	enable = true;
-	duty_cycle = 0;
+	target_duty_cycle = 0;
 }
 
 void TempRegulator::regulate(){
@@ -18,9 +18,9 @@ void TempRegulator::regulate(){
 		temperature = SCH_TR_VOLT_TO_TEMP(temp_volt);
 		if(enable)
 			// duty cycle depends on temperature
-			duty_cycle = Pwm.set_duty_cycle(SET_TR_VOLT_TO_DUTY_CYCLE(temp_volt));
+			set_duty_cycle(SET_TR_VOLT_TO_DUTY_CYCLE(temp_volt));
 		else
 			// duty cycle is manually adjusted
-			duty_cycle = Pwm.set_duty_cycle(duty_cycle);
+			set_duty_cycle(target_duty_cycle);
 	}
 }

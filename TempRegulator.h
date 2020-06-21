@@ -12,12 +12,13 @@ public:
 struct TR_state{
 	// Read / write
 	bool _enable;
-	int _duty_cycle;
+	int _target_duty_cycle;
 	bool _update;
 	
 	// Read only
 	float _temp_volt;
 	float _temp;
+	int _current_duty_cycle;
 };
 
 private:
@@ -30,7 +31,8 @@ HAL_PWM Pwm;
 bool enable;
 float temp_volt; // ADC reading of temp, in volts
 float temperature; // temperature, in celsius
-int duty_cycle; // duty cycle of PWM output
+int target_duty_cycle; // desired duty cycle
+int current_duty_cycle; // actual duty cycle
 unsigned long last_time; // last time run, in ms
 
 public:
@@ -44,12 +46,16 @@ void disable_regulation(){
 	enable = false;
 }
 // duty cycle
-void set_duty_cycle(int val){
-	// val is duty cycle, between 0 and 100
-	duty_cycle = val;
+int set_duty_cycle(int val){
+	// update target_duty_cycle
+	// update PWM output
+	// return current duty cyle
+	target_duty_cycle = val;
+	current_duty_cycle = Pwm.set_duty_cycle(target_duty_cycle);
+	return current_duty_cycle;
 }
 int get_duty_cycle(){
-	return duty_cycle;
+	return current_duty_cycle;
 }
 // temperature
 float get_temp_volt(){
@@ -59,10 +65,11 @@ float get_temp_volt(){
 void get_state(TR_state &state){
 	// Allows quick extraction of info
 	state._enable = enable;
-	state._duty_cycle = duty_cycle;
+	state._target_duty_cycle = target_duty_cycle;
 	state._update = false;
 	state._temp_volt = temp_volt;
 	state._temp = temperature;
+	state._current_duty_cycle = current_duty_cycle;
 }
 void set_state(TR_state &state){
 	// Allows quick configuration of info
@@ -70,9 +77,9 @@ void set_state(TR_state &state){
 	if(state._update){
 		state._update = false;
 		enable = state._enable;
-		duty_cycle = state._duty_cycle;
+		target_duty_cycle = state._target_duty_cycle;
 	}
 	
-	// don't update temp_volt or temperature
+	// don't update temp_volt, temperature or current_duty_cycle
 }
 };

@@ -167,7 +167,7 @@ void VL_Screen::update_text(){
 		strcat(text[3], "A: ");
 	else
 		strcat(text[3], "M: ");
-	dtostrf(_TR_state._duty_cycle, 3, 0, temp_buffer);
+	dtostrf(_TR_state._current_duty_cycle, 3, 0, temp_buffer);
 	strcat(text[3], temp_buffer);
 	strcat(text[3], " %");
 }
@@ -596,7 +596,7 @@ Screen::SCREEN_ID TR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 		// Update TR state, then return to main menu
 		if(index){
 			// put TR into manual mode, adjust duty cycle
-			_TR_state._duty_cycle = index_to_duty_cycle();
+			_TR_state._target_duty_cycle = index_to_duty_cycle();
 			_TR_state._enable = false;
 		} else{
 			// put TR into auto mode

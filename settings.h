@@ -32,13 +32,13 @@
 // CV current step size
 #define SET_LR_CV_CUR_STEP (0.001) // in amps
 // Current sampling period
-#define SET_LR_CUR_SAMPLE_PERIOD (17) // in ms
+#define SET_LR_CUR_SAMPLE_PERIOD (17) // in unites of LR timer
 
 /********************* Debugger *********************/
 // Define DEBUG as 1 to enable debugger
 #define DEBUG 1
 // Debugger output period
-#define SET_DEBUGGER_PERIOD (1000) // in ms
+#define SET_DEBUGGER_PERIOD (1000) // in unites of main timer
 // UART settings
 #define SET_UART_DATA_BITS (HAL_UART::UART_8_BITS)
 #define SET_UART_PARITY (HAL_UART::UART_PARITY_NONE)
@@ -55,7 +55,7 @@
 
 /********************* Temp Regulator *********************/
 // Temp regulator period
-#define SET_TR_PERIOD (100) // in ms
+#define SET_TR_PERIOD (100) // in units of main timer
 #define SET_TR_ADC_ADJ (HAL_ADC::ADC_RADJUST)
 #define SET_TR_TEMP_MIN (SCH_THERM_35C_VOLT)
 #define SET_TR_TEMP_MAX (SCH_THERM_85C_VOLT)
@@ -67,8 +67,8 @@
 // Encoder
 #define SET_UI_ENC_LONG_PRESS_THRESH (1000) // time necessary to be considered long press, in ms
 // LCD
-#define SET_UI_LCD_UPDATE_PERIOD (1000) // time between full screen updates, in ms
-#define SET_UI_LCD_CLEAR_PERIOD (2) // time in ms
+#define SET_UI_LCD_UPDATE_PERIOD (1000) // time between full screen updates, in units of main timer
+#define SET_UI_LCD_CLEAR_PERIOD (2) // time needed for clearing screen, in units of main timer
 // Screen
 #define SET_UI_SCREEN_MAX_LINES (8)
 // Formatting
