@@ -26,7 +26,7 @@ void Debugger::run_debugger(){
 		// Update values to report
 		float LR_measured_voltage = LR_r.get_measured_voltage();
 		float LR_measured_current = LR_r.get_measured_current();
-		float LR_control_current = LR_r.get_control_current();
+		float LR_control_current = 0;
 	
 		// Construct string
 		LED_G.on();
@@ -44,7 +44,7 @@ void Debugger::run_debugger(){
 				append_float(LR_r.get_target_current());
 				strcat(char_tx_buffer, " A (");
 				// Control current
-				append_float(LR_r.get_control_current());
+				append_float(LR_control_current);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::CP):
@@ -60,7 +60,7 @@ void Debugger::run_debugger(){
 				append_float(LR_r.get_target_power());
 				strcat(char_tx_buffer, " W (");
 				// Control current
-				append_float(LR_r.get_control_current());
+				append_float(LR_control_current);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::CR):
@@ -76,7 +76,7 @@ void Debugger::run_debugger(){
 				append_float(LR_r.get_target_resistance());
 				strcat(char_tx_buffer, " R (");
 				// Control current
-				append_float(LR_r.get_control_current());
+				append_float(LR_control_current);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::CV):
@@ -92,7 +92,7 @@ void Debugger::run_debugger(){
 				append_float(LR_measured_current);
 				strcat(char_tx_buffer, " A, ");
 				// Control current
-				append_float(LR_r.get_control_current());
+				append_float(LR_control_current);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::OFF):

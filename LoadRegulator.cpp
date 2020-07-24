@@ -17,60 +17,79 @@ LoadRegulator::LoadRegulator():
 	// Configure voltage monitor ADC
 	volt_monitor.set_input_range(SCH_ADS8685_RANGE, SCH_ADS8685_REF);
 	
-	// Set initial resistance and voltage values
+	// Set initial target values
+	target_current = SET_LR_INIT_CUR;
 	target_power = SET_LR_INIT_POW;
 	target_resistance = SET_LR_INIT_RES;
 	target_voltage = SET_LR_INIT_V;
 	
-	// Puts load regulator into innocuous state
-	// Calibrates zero
+	// Set initial times
 	last_cur_time = 0;
+	last_offset_time = 0;
+	last_desired_time = 0;
+	
+	// Set control parameters to 0
+	desired_current = 0;
+	offset = 0;
+	
+	// Set initial mode to OFF
 	set_mode(OFF);
-	regulate();
-	set_target_current(SET_LR_INIT_CUR);
-	calibrate_zero();
 }
 void LoadRegulator::regulate(){
-	// Only run code if timer flag is set
-	if(LR_Timer.get_flag()){
-		LR_Timer.clear_flag();
+	// update offset and desired as necessary, then update DAC output
+	
+	// get current time
+	unsigned long cur_time = LR_Timer.get_tick();
+	
+	// see if offset needs to be updated
+	if(cur_time - last_offset_time > SET_LR_OFFSET_UPDATE_PERIOD){
+		// enough time has passed that offset must be adjusted
+		last_offset_time = cur_time;
 		
-		// Update measured current if enough time has passed
-		HAL_TWI::TWI_ERROR error = HAL_TWI::TWI_MISC;
-		if(LR_Timer.get_tick() - last_cur_time > SET_LR_CUR_SAMPLE_PERIOD){
-			last_cur_time = LR_Timer.get_tick();
-			float cur_mon_volt = 0;
-			error = current_monitor.read(cur_mon_volt);
-			if(error == HAL_TWI::TWI_NO_ERROR){
-				// Only update measured current on valid read
-				measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
-			}
+		// measure current through load; only update on successful read
+		float cur_mon_volt = 0;
+		HAL_TWI::TWI_ERROR error = current_monitor.read(cur_mon_volt);
+		if(error == HAL_TWI::TWI_NO_ERROR){
+			// current read was successful
+			measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
+			
+			// increase offset by difference of desired and measured current
+			// only update offset if new calculated offset is within limits
+			float new_offset = offset + (desired_current - measured_current);
+			if((new_offset > SET_LR_OFFSET_MIN) && (new_offset < SET_LR_OFFSET_MAX))
+				offset = new_offset;
 		}
-		
-		// Update measured voltage
+	}
+	
+	// see if desired current & output needs to be updated
+	if(cur_time - last_desired_time > SET_LR_DESIRED_UPDATE_PERIOD){
+		// enough time has passed that desired current and DAC output must be adjusted
+		last_desired_time = cur_time;
+		// measure voltage across load
 		measured_voltage = SCH_ADS8685_GAIN * volt_monitor.read();
 		
-		// Update controls
+		// calculate desired current
 		switch(op_mode){
 			case(CC):
+				desired_current = target_current;
+				break;
 			case(CP):
+				desired_current = target_power / measured_voltage;
+				break;
 			case(CR):
-				// Adjust control current and update DAC output only when measured current is updated
-				if(error == HAL_TWI::TWI_NO_ERROR){
-					adjust_control_current();
-					current_control.set_output(SCH_AMP_TO_VOLT(control_current, cal_zero));
-				}
+				desired_current = measured_voltage / target_resistance;
 				break;
 			case(CV):
-				// Adjust control current and update DAC output
-				adjust_control_current();
-				current_control.set_output(SCH_AMP_TO_VOLT(control_current, cal_zero));
+				// TODO: figure out desired current for CV
+				desired_current = desired_current;
 				break;
 			case(OFF):
-			default:
-				current_control.set_output(SCH_ZERO_AMP_VOLT);
+				desired_current = 0;
 				break;
 		}
+		
+		// update DAC output
+		current_control.set_output(SCH_AMP_TO_VOLT(desired_current + offset, cal_zero));
 	}
 }
 void LoadRegulator::calibrate_zero(){
@@ -88,31 +107,4 @@ void LoadRegulator::calibrate_zero(){
 			i--;
 	}
 	cal_zero = sum / SET_LR_CAL_AMOUNT;
-}
-void LoadRegulator::adjust_control_current(){
-	// adjusts control current based on operation mode
-	switch(op_mode){
-		case(CC):
-			// In constant current mode, increase control current by difference of target and measured current
-			control_current += (target_current - measured_current) * SET_LR_CUR_ERROR_SCALER;
-			break;
-		case(CP):
-			// In constant power mode, increase control current by difference of (target power / measured voltage) and measured current
-			control_current += (target_power/measured_voltage - measured_current) * SET_LR_CUR_ERROR_SCALER;
-			break;
-		case(CR):
-			// In constant resistance mode, increase control current by difference of (measured voltage / target resistance) and measured current
-			// only updates for positive resistance values
-			if(target_resistance > 0)
-				control_current += (measured_voltage/target_resistance - measured_current) * SET_LR_CUR_ERROR_SCALER;
-		case(CV):
-			// In constant voltage mode, increase control current by certain amount if voltage across load is too high; decrease otherwise
-			if(measured_voltage > target_voltage)
-				control_current += SET_LR_CV_CUR_STEP;
-			else
-				control_current -= SET_LR_CV_CUR_STEP;
-		default:
-			// Error case; do nothing
-			break;
-	}
 }
