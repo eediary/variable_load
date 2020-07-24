@@ -9,7 +9,7 @@
 // Start-up delay
 #define SET_CAL_DELAY (10) // in ms
 // Temperature fail-safe
-#define SET_MAX_TEMP (95)
+#define SET_MAX_TEMP (75)
 // Power down mode
 #define SET_SLEEP_MODE (SLEEP_MODE_IDLE)
 
@@ -31,7 +31,7 @@
 #define SET_LR_CAL_AMOUNT (10)
 // Target max values
 #define SET_LR_CUR_MAX (10) // in amps
-#define SET_LR_POW_MAX (100) // in watts
+#define SET_LR_POW_MAX (400) // in watts
 #define SET_LR_RES_MAX (999.99) // in ohms
 #define SET_LR_VOLT_MAX (30) // in volts
 // Desired current limits
@@ -73,7 +73,7 @@
 #define SET_TR_PERIOD (100) // in units of main timer
 #define SET_TR_ADC_ADJ (HAL_ADC::ADC_RADJUST)
 #define SET_TR_TEMP_MIN (35)
-#define SET_TR_TEMP_MAX (85)
+#define SET_TR_TEMP_MAX (65)
 #define SET_TR_DUTY_CYCLE_MIN (0)
 #define SET_TR_DUTY_CYCLE_MAX (100)
 #define SET_TR_TEMP_TO_DUTY_CYCLE(T) ((SET_TR_DUTY_CYCLE_MAX-SET_TR_DUTY_CYCLE_MIN)/(SET_TR_TEMP_MAX-SET_TR_TEMP_MIN)*(T-SET_TR_TEMP_MIN)+SET_TR_DUTY_CYCLE_MIN)
