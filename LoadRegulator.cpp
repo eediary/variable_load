@@ -94,6 +94,10 @@ void LoadRegulator::regulate(){
 }
 void LoadRegulator::calibrate_zero(){
 	// Sets cal_zero to average of several current monitor readings
+	// Set output to zero current
+	current_control.set_output(SCH_ZERO_AMP_VOLT);
+	
+	// Get average of several readings
 	float sum = 0;
 	HAL_TWI::TWI_ERROR error;
 	for(int i = 0; i < SET_LR_CAL_AMOUNT; i++){
@@ -106,5 +110,7 @@ void LoadRegulator::calibrate_zero(){
 			// Error occurred; try again
 			i--;
 	}
+	
+	// update cal_zero
 	cal_zero = sum / SET_LR_CAL_AMOUNT;
 }
