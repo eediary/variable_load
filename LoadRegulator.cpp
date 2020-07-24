@@ -68,7 +68,7 @@ void LoadRegulator::regulate(){
 		// measure voltage across load
 		measured_voltage = SCH_ADS8685_GAIN * volt_monitor.read();
 		
-		// calculate desired current
+		// calculate desired current and DAC output
 		switch(op_mode){
 			case(CC):
 				desired_current = target_current;
@@ -80,16 +80,29 @@ void LoadRegulator::regulate(){
 				desired_current = measured_voltage / target_resistance;
 				break;
 			case(CV):
-				// TODO: figure out desired current for CV
-				desired_current = desired_current;
+				// adjust desired current based on voltage across load
+				if(measured_voltage > target_voltage + SET_LR_CV_TOL)
+					desired_current += SET_LR_CV_CUR_STEP;
+				else if (measured_voltage < target_voltage - SET_LR_CV_TOL)
+					desired_current -= SET_LR_CV_CUR_STEP;
+				// limit desired current
+				if(desired_current > SET_LR_DESIRED_CUR_MAX)
+					desired_current = SET_LR_DESIRED_CUR_MAX;
+				else if(desired_current < SET_LR_DESIRED_CUR_MIN)
+					desired_current = SET_LR_DESIRED_CUR_MIN;
 				break;
 			case(OFF):
 				desired_current = 0;
 				break;
 		}
 		
-		// update DAC output
-		current_control.set_output(SCH_AMP_TO_VOLT(desired_current + offset, cal_zero));
+		// Update DAC output
+		if(desired_current == 0){
+			// zero current is special case
+			current_control.set_output(SCH_ZERO_AMP_VOLT);
+		} else{
+			current_control.set_output(SCH_AMP_TO_VOLT(desired_current + offset, cal_zero));
+		}
 	}
 }
 void LoadRegulator::calibrate_zero(){

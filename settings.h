@@ -34,6 +34,9 @@
 #define SET_LR_POW_MAX (100) // in watts
 #define SET_LR_RES_MAX (999.99) // in ohms
 #define SET_LR_VOLT_MAX (30) // in volts
+// Desired current limits
+#define SET_LR_DESIRED_CUR_MAX (SET_LR_CUR_MAX)
+#define SET_LR_DESIRED_CUR_MIN (0)
 // Initial target values
 #define SET_LR_INIT_CUR (0) // in amps
 #define SET_LR_INIT_POW (0) // in watts
@@ -41,6 +44,8 @@
 #define SET_LR_INIT_V (SET_LR_VOLT_MAX) // in volts
 // CV current step size
 #define SET_LR_CV_CUR_STEP (0.001) // in amps
+// CV tolerance
+#define SET_LR_CV_TOL (0.01) // in volts
 // Current sampling period
 #define SET_LR_CUR_SAMPLE_PERIOD (17) // in unites of LR timer
 
