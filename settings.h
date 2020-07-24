@@ -15,10 +15,16 @@
 
 /********************* LOAD REGULATOR *********************/
 // Load Regulator sampling frequency
-// Set to 1 ms
+// Set to 100 us (10 kHz)
 #define SET_LR_TIMER_NUMBER (HAL_Timer::TIMER_TIMER1)
 #define SET_LR_TIMER_DIV (HAL_Timer::TIMER_CLK_DIV64)
-#define SET_LR_TIMER_TOP (249)
+#define SET_LR_TIMER_TOP (24)
+// periods
+#define SET_LR_DESIRED_UPDATE_PERIOD (10) // time between target updates, in units of LR timer
+#define SET_LR_OFFSET_UPDATE_PERIOD (167) // time between offset updates, in units of LR timer
+// offset limits
+#define SET_LR_OFFSET_MIN (-0.05) // offset minimum, in amps
+#define SET_LR_OFFSET_MAX (0.05) // offset maxcimum, in amps
 // Current control parameters
 #define SET_LR_CUR_ERROR_SCALER (0.5)
 // Zero current calibration amount

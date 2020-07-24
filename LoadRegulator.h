@@ -32,7 +32,6 @@ struct LR_state
 	// Read only
 	float _measured_current;
 	float _measured_voltage;
-	float _control_current;
 };
 
 private:
@@ -48,15 +47,18 @@ MAX5216 current_control;
 ADS8685 volt_monitor;
 // Data
 float cal_zero; // voltage at zero current
-float target_current; // desired current going through load, in amps
-float target_power; // desired power dissipated by load, in watts
-float target_resistance; // desired resistance of load, in ohms
-float target_voltage; // desired voltage across load, in volts
-float measured_current; // current going through load, in amps
-float control_current; // controlled variable adjusted to get target current, in amps
+float target_current; // target current in CC mode, in amps
+float target_power; // target power in CP mode, in watts
+float target_resistance; // target resistance in CR mode, in ohms
+float target_voltage; // target voltage in CV mode, in volts
+float measured_current; // measured current going through load, in amps
+float desired_current; // desired current through load
+float offset; // offset for accurate current
 float measured_voltage; // in volts
 // misc
 unsigned long last_cur_time; // last time current was measured; in ms
+unsigned long last_desired_time; // last time desired was updated
+unsigned long last_offset_time; // last time offset was updated
 operation_mode op_mode;
 
 public:
@@ -77,7 +79,6 @@ void set_target_current(float val){
 	// val is in amps
 	// control current starts same as target current, adjusted in regulate method
 	target_current = val;
-	control_current = val;
 }
 float get_target_current(){
 	// returns target current in amps
@@ -87,11 +88,6 @@ float get_measured_current(){
 	// returns measured current in amps
 	return measured_current;
 }
-float get_control_current(){
-	// returns control current, in amps
-	return control_current;
-}
-void adjust_control_current();
 // Power
 void set_target_power(float val){
 	// val is in watts
@@ -134,7 +130,6 @@ void get_state(LR_state &state){
 	state._update = false;
 	state._measured_current = measured_current;
 	state._measured_voltage = measured_voltage;
-	state._control_current = control_current;
 }
 void set_state(LR_state &state){
 	// Only uses writable members
