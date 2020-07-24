@@ -17,7 +17,7 @@ Equations above are rewritten forms of first equation
 Commonly used configurations (for F_IO = 16 MHz):
   Time 		Freq 		Divider 	Top
 - 1 us 		1 MHz 		1			15
-- 10 us		100 kHz 	8			1
+- 10 us		100 kHz 	8			19
 - 100 us	10 kHz 		64			24
 - 1 ms		1 kHz 		64			249
 - 10 ms		100 Hz 		256			624
