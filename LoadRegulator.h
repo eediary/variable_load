@@ -88,6 +88,12 @@ float get_measured_current(){
 	// returns measured current in amps
 	return measured_current;
 }
+float get_desired_current(){
+	return desired_current;
+}
+float get_offset(){
+	return offset;
+}
 // Power
 void set_target_power(float val){
 	// val is in watts

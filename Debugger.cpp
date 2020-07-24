@@ -26,7 +26,8 @@ void Debugger::run_debugger(){
 		// Update values to report
 		float LR_measured_voltage = LR_r.get_measured_voltage();
 		float LR_measured_current = LR_r.get_measured_current();
-		float LR_control_current = 0;
+		float LR_desired_current = LR_r.get_desired_current();
+		float LR_offset = LR_r.get_offset();
 	
 		// Construct string
 		LED_G.on();
@@ -39,12 +40,12 @@ void Debugger::run_debugger(){
 				strcat(char_tx_buffer, " V, ");
 				// Measured current
 				append_float(LR_measured_current);
-				strcat(char_tx_buffer, " A, ");
-				// Target current
-				append_float(LR_r.get_target_current());
+				strcat(char_tx_buffer, " A / ");
+				// Desired current
+				append_float(LR_desired_current);
 				strcat(char_tx_buffer, " A (");
-				// Control current
-				append_float(LR_control_current);
+				// Offset current
+				append_float(LR_offset);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::CP):
@@ -58,9 +59,12 @@ void Debugger::run_debugger(){
 				strcat(char_tx_buffer, " W / ");
 				// Target power
 				append_float(LR_r.get_target_power());
-				strcat(char_tx_buffer, " W (");
-				// Control current
-				append_float(LR_control_current);
+				strcat(char_tx_buffer, " W, ");
+				// Desired current
+				append_float(LR_desired_current);
+				strcat(char_tx_buffer, " A (");
+				// Offset current
+				append_float(LR_offset);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::CR):
@@ -74,9 +78,12 @@ void Debugger::run_debugger(){
 				strcat(char_tx_buffer, " R / ");
 				// Target resistance
 				append_float(LR_r.get_target_resistance());
-				strcat(char_tx_buffer, " R (");
-				// Control current
-				append_float(LR_control_current);
+				strcat(char_tx_buffer, " R, ");
+				// Desired current
+				append_float(LR_desired_current);
+				strcat(char_tx_buffer, " A (");
+				// Offset current
+				append_float(LR_offset);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::CV):
@@ -91,8 +98,11 @@ void Debugger::run_debugger(){
 				// Measured current
 				append_float(LR_measured_current);
 				strcat(char_tx_buffer, " A, ");
-				// Control current
-				append_float(LR_control_current);
+				// Desired current
+				append_float(LR_desired_current);
+				strcat(char_tx_buffer, " A (");
+				// Offset current
+				append_float(LR_offset);
 				strcat(char_tx_buffer, " A)");
 				break;
 			case(LoadRegulator::OFF):
