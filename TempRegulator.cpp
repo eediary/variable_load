@@ -12,13 +12,18 @@ TempRegulator::TempRegulator(HAL_Timer &Timer_r):
 
 void TempRegulator::regulate(){
 	// Only run if enough time has passed
-	if(Timer.get_tick() - last_time > SET_TR_PERIOD){
-		last_time = Timer.get_tick();
-		temp_volt = SCH_TR_ADC_TO_VOLT(Adc.read(SCH_TR_ADC_TEMP_MUX));
-		temperature = SCH_TR_VOLT_TO_TEMP(temp_volt);
+	unsigned long cur_time = Timer.get_tick();
+	if(cur_time - last_time > SET_TR_PERIOD){
+		// sufficient time has passed to run loop
+		last_time = cur_time;
+		
+		// Convert ADC to voltage, then voltage to temperature
+		temperature = SCH_TR_VOLT_TO_TEMP(SCH_TR_ADC_TO_VOLT(Adc.read(SCH_TR_ADC_TEMP_MUX)));
+		
+		// set duty cycle
 		if(enable)
-			// duty cycle depends on temperature
-			set_duty_cycle(SET_TR_VOLT_TO_DUTY_CYCLE(temp_volt));
+			// use temperature to determine duty cycle
+			set_duty_cycle(SET_TR_TEMP_TO_DUTY_CYCLE(temperature));
 		else
 			// duty cycle is manually adjusted
 			set_duty_cycle(target_duty_cycle);

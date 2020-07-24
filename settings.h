@@ -9,7 +9,7 @@
 // Start-up delay
 #define SET_CAL_DELAY (10) // in ms
 // Temperature fail-safe
-#define SET_MAX_TEMP_VOLT (SCH_THERM_95C_VOLT)
+#define SET_MAX_TEMP (95)
 // Power down mode
 #define SET_SLEEP_MODE (SLEEP_MODE_IDLE)
 
@@ -72,11 +72,11 @@
 // Temp regulator period
 #define SET_TR_PERIOD (100) // in units of main timer
 #define SET_TR_ADC_ADJ (HAL_ADC::ADC_RADJUST)
-#define SET_TR_TEMP_MIN (SCH_THERM_35C_VOLT)
-#define SET_TR_TEMP_MAX (SCH_THERM_85C_VOLT)
+#define SET_TR_TEMP_MIN (35)
+#define SET_TR_TEMP_MAX (85)
 #define SET_TR_DUTY_CYCLE_MIN (0)
 #define SET_TR_DUTY_CYCLE_MAX (100)
-#define SET_TR_VOLT_TO_DUTY_CYCLE(V) ((SET_TR_DUTY_CYCLE_MAX-SET_TR_DUTY_CYCLE_MIN)/(SET_TR_TEMP_MAX-SET_TR_TEMP_MIN)*(V-SET_TR_TEMP_MIN)+SET_TR_DUTY_CYCLE_MIN)
+#define SET_TR_TEMP_TO_DUTY_CYCLE(T) ((SET_TR_DUTY_CYCLE_MAX-SET_TR_DUTY_CYCLE_MIN)/(SET_TR_TEMP_MAX-SET_TR_TEMP_MIN)*(T-SET_TR_TEMP_MIN)+SET_TR_DUTY_CYCLE_MIN)
 
 /********************* User Interface *********************/
 // Encoder
