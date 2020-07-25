@@ -2,6 +2,8 @@
 // Project headers
 #include "schematic.h"
 #include "settings.h"
+// AVR headers
+#include <util/delay.h>
 // HAL headers
 #include "HAL_Timer.h"
 #include "HAL_SPI.h"

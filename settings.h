@@ -22,14 +22,15 @@
 // periods
 #define SET_LR_DESIRED_UPDATE_PERIOD (10) // time between target updates, in units of LR timer
 #define SET_LR_OFFSET_UPDATE_PERIOD (167) // time between offset updates, in units of LR timer
-#define SET_LR_CAL_DELAY_PERIOD (10000) // delay time for calibration, in units of LR timer
+#define SET_LR_CAL_DELAY_PERIOD (100) // delay time for calibration, in units of LR timer
 // offset limits
 #define SET_LR_OFFSET_MIN (-0.05) // offset minimum, in amps
 #define SET_LR_OFFSET_MAX (0.05) // offset maxcimum, in amps
 // Current control parameters
 #define SET_LR_CUR_ERROR_SCALER (0.5)
 // Zero current calibration amount
-#define SET_LR_CAL_AMOUNT (10)
+#define SET_LR_CAL_AMOUNT (10) // number of samples to average
+#define SET_LR_CAL_FLUSH_AMOUNT (5) // number of samples to discard
 // Target max values
 #define SET_LR_CUR_MAX (10) // in amps
 #define SET_LR_POW_MAX (400) // in watts

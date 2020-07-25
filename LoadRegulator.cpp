@@ -111,19 +111,20 @@ void LoadRegulator::calibrate_zero(){
 	current_control.set_output(SCH_ZERO_AMP_VOLT);
 	
 	// Pause to let system stabilize
-// 	unsigned long start_time = LR_Timer.get_tick();
-// 	while(start_time - LR_Timer.get_tick() < SET_LR_CAL_DELAY_PERIOD);
+	unsigned long start_time = LR_Timer.get_tick();
+	while(start_time - LR_Timer.get_tick() < SET_LR_CAL_DELAY_PERIOD);
 	
 	// Get average of several readings
 	float sum = 0;
 	HAL_TWI::TWI_ERROR error;
-	for(int i = 0; i < SET_LR_CAL_AMOUNT; i++){
+	for(int i = 0; i < SET_LR_CAL_AMOUNT + SET_LR_CAL_FLUSH_AMOUNT; i++){
 		float temp_val = 0;
 		error = current_monitor.read(temp_val);
-		if(error == HAL_TWI::TWI_NO_ERROR)
-			// Got reading; use it
-			sum += temp_val;
-		else
+		if(error == HAL_TWI::TWI_NO_ERROR){
+			// Got reading; only use samples after flushing completes
+			if(i >= SET_LR_CAL_FLUSH_AMOUNT)
+				sum += temp_val;
+		}else
 			// Error occurred; try again
 			i--;
 	}
