@@ -11,7 +11,6 @@
 // AVR headers
 #include <avr/interrupt.h>
 #include <avr/sleep.h>
-#include <util/delay.h>
 // HAL headers
 #include "HAL_Timer.h"
 // Module headers
@@ -40,15 +39,15 @@ int main(void)
 	Debugger DebuggerModule = Debugger(LoadReg, TempReg, MainTimer);
 	#endif
 	
-	// Recal zero after delay
-	_delay_ms(SET_CAL_DELAY);
-	LoadReg.calibrate_zero();
-	
 	// Configure sleep mode
 	set_sleep_mode(SET_SLEEP_MODE);
 	
 	// Enable global interrupt
 	sei();
+	
+	// Calibrate zero
+	LoadReg.calibrate_zero();
+	
     while (1) 
     {
 		// Run load regulator and update state

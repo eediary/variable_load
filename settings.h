@@ -22,6 +22,7 @@
 // periods
 #define SET_LR_DESIRED_UPDATE_PERIOD (10) // time between target updates, in units of LR timer
 #define SET_LR_OFFSET_UPDATE_PERIOD (167) // time between offset updates, in units of LR timer
+#define SET_LR_CAL_DELAY_PERIOD (10000) // delay time for calibration, in units of LR timer
 // offset limits
 #define SET_LR_OFFSET_MIN (-0.05) // offset minimum, in amps
 #define SET_LR_OFFSET_MAX (0.05) // offset maxcimum, in amps

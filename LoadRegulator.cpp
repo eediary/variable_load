@@ -8,7 +8,7 @@ LoadRegulator::LoadRegulator():
 	LR_CUR_CONT_CS(SCH_MAX5216_CS_PORT, SCH_MAX5216_CS_PIN, SCH_MAX5216_CS_DIR, SCH_MAX5216_CS_VAL),
 	LR_VMON_CS(SCH_ADS8685_CS_PORT, SCH_ADS8685_CS_PIN, SCH_ADS8685_CS_DIR, SCH_ADS8685_CS_VAL),
 	current_monitor(LR_TWI, SCH_LTC2451_REF),
-	current_control(LR_CUR_CONT_CS, LR_SPI, SCH_MAX5216_REF),
+	current_control(LR_CUR_CONT_CS, LR_SPI, SCH_MAX5216_REF, MAX5216::OUT_GND_1K),
 	volt_monitor(LR_VMON_CS, LR_SPI)
 {
 	// Enable timer interrupt
@@ -109,6 +109,10 @@ void LoadRegulator::calibrate_zero(){
 	// Sets cal_zero to average of several current monitor readings
 	// Set output to zero current
 	current_control.set_output(SCH_ZERO_AMP_VOLT);
+	
+	// Pause to let system stabilize
+// 	unsigned long start_time = LR_Timer.get_tick();
+// 	while(start_time - LR_Timer.get_tick() < SET_LR_CAL_DELAY_PERIOD);
 	
 	// Get average of several readings
 	float sum = 0;

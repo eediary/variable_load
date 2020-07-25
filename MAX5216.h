@@ -28,14 +28,14 @@ const int resolution;
 const float reference_volt;
 
 public:
-MAX5216(HAL_GPIO &gpio_r, HAL_SPI &spi_r, float ref_volt) : 
+MAX5216(HAL_GPIO &gpio_r, HAL_SPI &spi_r, float ref_volt, MAX5216_POWER_DOWN_MODES pd_mode = OUT_HIGH_Z) : 
 	cs_gpio(gpio_r),
 	spi(spi_r),
 	resolution(MAX5216_RESOLUTION),
 	reference_volt(ref_volt)
 {
 	// Chip start out disabled, output high impedance
-	power_down(OUT_HIGH_Z);
+	power_down(pd_mode);
 	
 }
 void nop(){
