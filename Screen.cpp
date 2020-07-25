@@ -110,8 +110,9 @@ void VL_Screen::update_text(){
 	char temp_buffer[SCH_UI_LCD_COLS];
 	
 	// Limit display voltage, current, power and resistance to non-negative numbers
-	float display_voltage = (_LR_r.get_measured_voltage() < 0) ? 0 : _LR_r.get_measured_voltage();
-	float display_current = (_LR_r.get_measured_current() < 0) ? 0 : _LR_r.get_measured_current();
+	// voltage and current are averages of several samples to reduce jumpy values
+	float display_voltage = (_LR_r.get_average_voltage() < 0) ? 0 : _LR_r.get_average_voltage();
+	float display_current = (_LR_r.get_average_current() < 0) ? 0 : _LR_r.get_average_current();
 	float display_power = display_voltage * display_current;
 	float display_resistance = display_voltage / display_current;
 	

@@ -51,8 +51,8 @@
 // Current sampling period
 #define SET_LR_CUR_SAMPLE_PERIOD (17) // in unites of LR timer
 // Sample size for averaging
-#define SET_LR_MEAS_CURR_SAMPLES (5) // samples of measured current to average
-#define SET_LR_MEAS_VOLT_SAMPLES (5) // samples of measured voltage to average
+#define SET_LR_MEAS_CURR_SAMPLES (10) // samples of measured current to average
+#define SET_LR_MEAS_VOLT_SAMPLES (20) // samples of measured voltage to average
 
 /********************* Debugger *********************/
 // Define DEBUG as 1 to enable debugger
