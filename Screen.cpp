@@ -62,9 +62,9 @@ int Screen::get_cursor(){
 }
 
 /********************* VL screen *********************/
-VL_Screen::VL_Screen(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r): 
-	_LR_state(LR_state_r),
-	_TR_state(TR_state_r)
+VL_Screen::VL_Screen(LoadRegulator &LR_ref, TempRegulator &TR_ref): 
+	_LR_r(LR_ref),
+	_TR_r(TR_ref)
 {
 	// Initialize data
 	row_offset = 0;
@@ -81,7 +81,7 @@ VL_Screen::VL_Screen(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_stat
 }
 void VL_Screen::res_to_text(float val, char* dest, int width, int prec){
 	// Writes val to dest as text, with appropriate units and formatting
-	// Reduce va as necessary
+	// Reduce val as necessary
 	int res_units_index = 0;
 	char res_units[3][4] = { "  R", " kR", " MR"};
 	res_units[0][2] = OHM_ICON; // replace R with ?
@@ -110,8 +110,8 @@ void VL_Screen::update_text(){
 	char temp_buffer[SCH_UI_LCD_COLS];
 	
 	// Limit display voltage, current, power and resistance to non-negative numbers
-	float display_voltage = (_LR_state._measured_voltage < 0) ? 0 : _LR_state._measured_voltage;
-	float display_current = (_LR_state._measured_current < 0) ? 0 : _LR_state._measured_current;
+	float display_voltage = (_LR_r.get_measured_voltage() < 0) ? 0 : _LR_r.get_measured_voltage();
+	float display_current = (_LR_r.get_measured_current() < 0) ? 0 : _LR_r.get_measured_current();
 	float display_power = display_voltage * display_current;
 	float display_resistance = display_voltage / display_current;
 	
@@ -130,27 +130,27 @@ void VL_Screen::update_text(){
 	
 	// Line 3: display mode and target value
 	// Update mode
-	switch(_LR_state._op_mode){
+	switch(_LR_r.get_mode()){
 		case(LoadRegulator::CC):
 			strcpy(text[2], "CC: ");
-			dtostrf(_LR_state._target_current, SET_UI_TARGET_CURR_WIDTH, SET_UI_TARGET_CURR_DECIMAL, temp_buffer);
+			dtostrf(_LR_r.get_target_current(), SET_UI_TARGET_CURR_WIDTH, SET_UI_TARGET_CURR_DECIMAL, temp_buffer);
 			strcat(text[2], temp_buffer);
 			strcat(text[2], " A");
 			break;
 		case(LoadRegulator::CP):
 			strcpy(text[2], "CP: ");
-			dtostrf(_LR_state._target_power, SET_UI_TARGET_POW_WIDTH, SET_UI_TARGET_POW_DECIMAL, temp_buffer);
+			dtostrf(_LR_r.get_target_power(), SET_UI_TARGET_POW_WIDTH, SET_UI_TARGET_POW_DECIMAL, temp_buffer);
 			strcat(text[2], temp_buffer);
 			strcat(text[2], " W");
 			break;
 		case(LoadRegulator::CR):
 			strcpy(text[2], "CR: ");
-			res_to_text(_LR_state._target_resistance, temp_buffer, SET_UI_TARGET_RES_WIDTH, SET_UI_TARGET_RES_DECIMAL);
+			res_to_text(_LR_r.get_target_resistance(), temp_buffer, SET_UI_TARGET_RES_WIDTH, SET_UI_TARGET_RES_DECIMAL);
 			strcat(text[2], temp_buffer);
 			break;
 		case(LoadRegulator::CV):
 			strcpy(text[2], "CV: ");
-			dtostrf(_LR_state._target_voltage, SET_UI_TARGET_VOLT_WIDTH, SET_UI_TARGET_VOLT_DECIMAL, temp_buffer);
+			dtostrf(_LR_r.get_target_voltage(), SET_UI_TARGET_VOLT_WIDTH, SET_UI_TARGET_VOLT_DECIMAL, temp_buffer);
 			strcat(text[2], temp_buffer);
 			strcat(text[2], " V");
 			break;
@@ -160,14 +160,14 @@ void VL_Screen::update_text(){
 	}
 	
 	// Line 4: display temperature and duty cycle
-	dtostrf(_TR_state._temp, SET_UI_TEMP_WIDTH, SET_UI_TEMP_DECIMAL, text[3]);
+	dtostrf(_TR_r.get_temp(), SET_UI_TEMP_WIDTH, SET_UI_TEMP_DECIMAL, text[3]);
 	strcat(text[3], "  C     ");
 	text[3][SET_UI_TEMP_WIDTH + 1] = DEG_ICON;
-	if(_TR_state._enable)
+	if(_TR_r.is_enabled())
 		strcat(text[3], "A: ");
 	else
 		strcat(text[3], "M: ");
-	dtostrf(_TR_state._current_duty_cycle, 3, 0, temp_buffer);
+	dtostrf(_TR_r.get_duty_cycle(), 3, 0, temp_buffer);
 	strcat(text[3], temp_buffer);
 	strcat(text[3], " %");
 }
@@ -176,15 +176,13 @@ Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Enc
 	// Push toggle output enable
 	if(btn == Encoder::PUSH){
 		// Toggle output enable, don't change screen
-		if(_LR_state._op_mode == LoadRegulator::OFF){
+		if(_LR_r.get_mode() == LoadRegulator::OFF){
 			// Mode is OFF, so update to old mode
-			_LR_state._op_mode = last_mode;
-			_LR_state._update = true;
+			_LR_r.set_mode(last_mode);
 		} else{
 			// Mode is not oFF, so save mode then disable
-			last_mode = _LR_state._op_mode;
-			_LR_state._op_mode = LoadRegulator::OFF;
-			_LR_state._update = true;
+			last_mode = _LR_r.get_mode();
+			_LR_r.set_mode(LoadRegulator::OFF);
 		}
 		return Screen::VL_SCREEN;
 	}
@@ -259,8 +257,8 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 	return Screen::MAIN_MENU_SCREEN;
 }
 /********************* LR Val screen *********************/
-LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
-	_LR_state(LR_state_r)
+LR_Val_Screen::LR_Val_Screen(LoadRegulator &LR_ref):
+	_LR_r(LR_ref)
 {
 	// Initialize data
 	row_offset = 0;
@@ -284,7 +282,7 @@ LR_Val_Screen::LR_Val_Screen(LoadRegulator::LR_state &LR_state_r):
 }
 void LR_Val_Screen::update_text(){
 	// use local op mode if coming from LR mode screen, or actual op mode if coming from main menu
-	LoadRegulator::operation_mode mode = (use_local_op_mode) ? local_op_mode : _LR_state._op_mode;
+	LoadRegulator::operation_mode mode = (use_local_op_mode) ? local_op_mode : _LR_r.get_mode();
 	
 	// Update local value if necessary
 	if(update_local_val){
@@ -292,25 +290,25 @@ void LR_Val_Screen::update_text(){
 		update_local_val = false;
 		switch(mode){
 			case(LoadRegulator::CC):
-				local_target_val = _LR_state._target_current;
+				local_target_val = _LR_r.get_target_current();
 				display_width = SET_UI_LOCAL_TARGET_CUR_WIDTH;
 				display_dec = SET_UI_LOCAL_TARGET_CUR_DECIMAL;
 				local_val_max = SET_LR_CUR_MAX;
 				break;
 			case(LoadRegulator::CP):
-				local_target_val = _LR_state._target_power;
+				local_target_val = _LR_r.get_target_power();
 				display_width = SET_UI_LOCAL_TARGET_POW_WIDTH;
 				display_dec = SET_UI_LOCAL_TARGET_POW_DECIMAL;
 				local_val_max = SET_LR_POW_MAX;
 				break;
 			case(LoadRegulator::CR):
-				local_target_val = _LR_state._target_resistance;
+				local_target_val = _LR_r.get_target_resistance();
 				display_width = SET_UI_LOCAL_TARGET_RES_WIDTH;
 				display_dec = SET_UI_LOCAL_TARGET_RES_DECIMAL;
 				local_val_max = SET_LR_RES_MAX;
 				break;
 			case(LoadRegulator::CV):
-				local_target_val = _LR_state._target_voltage;
+				local_target_val = _LR_r.get_target_voltage();
 				display_width = SET_UI_LOCAL_TARGET_VOLT_WIDTH;
 				display_dec = SET_UI_LOCAL_TARGET_VOLT_DECIMAL;
 				local_val_max = SET_LR_VOLT_MAX;
@@ -362,7 +360,7 @@ void LR_Val_Screen::update_text(){
 }
 Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn){
 	// use local op mode if coming from LR mode screen, or actual op mode if coming from main menu
-	LoadRegulator::operation_mode mode = (use_local_op_mode) ? local_op_mode : _LR_state._op_mode;
+	LoadRegulator::operation_mode mode = (use_local_op_mode) ? local_op_mode : _LR_r.get_mode();
 	
 	// Push to switch modes or save value
 	if(btn == Encoder::PUSH){
@@ -371,20 +369,20 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 			// Use either local or actual op mode
 			switch(mode){
 				case(LoadRegulator::CC):
-					_LR_state._target_current = local_target_val;
-					_LR_state._op_mode = LoadRegulator::CC;
+					_LR_r.set_target_current(local_target_val);
+					_LR_r.set_mode(LoadRegulator::CC);
 					break;
 				case(LoadRegulator::CP):
-					_LR_state._target_power = local_target_val;
-					_LR_state._op_mode = LoadRegulator::CP;
+					_LR_r.set_target_power(local_target_val);
+					_LR_r.set_mode(LoadRegulator::CP);
 					break;
 				case(LoadRegulator::CR):
-					_LR_state._target_resistance = local_target_val;
-					_LR_state._op_mode = LoadRegulator::CR;
+					_LR_r.set_target_resistance(local_target_val);
+					_LR_r.set_mode(LoadRegulator::CR);
 					break;
 				case(LoadRegulator::CV):
-					_LR_state._target_voltage = local_target_val;
-					_LR_state._op_mode = LoadRegulator::CV;
+					_LR_r.set_target_voltage(local_target_val);
+					_LR_r.set_mode(LoadRegulator::CV);
 					break;
 				default:
 					// Do nothing for OFF
@@ -394,8 +392,6 @@ Screen::SCREEN_ID LR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 			update_local_val = true;
 			// Disable using local op mode in case coming directly from main menu
 			use_local_op_mode = false;
-			// Enable update and return to main menu
-			_LR_state._update = true;
 			// Reset cursor and digit selection
 			digit_index = 0;
 			select_digit = true;
@@ -477,8 +473,8 @@ LoadRegulator::operation_mode LR_Val_Screen::get_op_mode(){
 	return local_op_mode;
 }
 /********************* LR Mode screen *********************/
-LR_Mode_Screen::LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r, LR_Val_Screen &LR_Val_Screen_r):
-_LR_state(LR_state_r),
+LR_Mode_Screen::LR_Mode_Screen(LoadRegulator &LR_ref, LR_Val_Screen &LR_Val_Screen_r):
+_LR_r(LR_ref),
 _LR_Val_Screen(LR_Val_Screen_r)
 {
 	// Initialize data
@@ -520,7 +516,7 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 				_LR_Val_Screen.update_op_mode(LoadRegulator::CV);
 				break;
 			case(5):
-				_LR_state._op_mode = LoadRegulator::OFF;
+				_LR_r.set_mode(LoadRegulator::OFF);
 				break;
 			default:
 				// Shouldn't be here; do nothing
@@ -532,10 +528,8 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 		else{
 			// If OFF is selected, update and return to main menu. Otherwise go to LR Val screen
 			if(get_cursor() == 5){
-				_LR_state._update = true;
 				return Screen::MAIN_MENU_SCREEN;
 			}else{
-				_LR_state._update = false;
 				return Screen::LR_VAL_SCREEN;
 			}
 		}
@@ -557,8 +551,8 @@ Screen::SCREEN_ID LR_Mode_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder
 	return Screen::LR_MODE_SCREEN;
 }
 /********************* TR Val screen *********************/
-TR_Val_Screen::TR_Val_Screen(TempRegulator::TR_state &TR_state_r):
-_TR_state(TR_state_r)
+TR_Val_Screen::TR_Val_Screen(TempRegulator &TR_ref):
+_TR_r(TR_ref)
 {
 	// Initialize data
 	row_offset = 0;
@@ -596,13 +590,12 @@ Screen::SCREEN_ID TR_Val_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder:
 		// Update TR state, then return to main menu
 		if(index){
 			// put TR into manual mode, adjust duty cycle
-			_TR_state._target_duty_cycle = index_to_duty_cycle();
-			_TR_state._enable = false;
+			_TR_r.set_duty_cycle(index_to_duty_cycle());
+			_TR_r.disable_regulation();
 		} else{
 			// put TR into auto mode
-			_TR_state._enable = true;
+			_TR_r.enable_regulation();
 		}
-		_TR_state._update = true;
 		return MAIN_MENU_SCREEN;
 	}
 	

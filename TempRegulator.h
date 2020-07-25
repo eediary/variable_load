@@ -9,17 +9,6 @@
 
 class TempRegulator{
 public:
-struct TR_state{
-	// Read / write
-	bool _enable;
-	int _target_duty_cycle;
-	bool _update;
-	
-	// Read only
-	float _temp;
-	int _current_duty_cycle;
-};
-
 private:
 // HAL classes
 HAL_Timer &Timer;
@@ -43,6 +32,9 @@ void enable_regulation(){
 void disable_regulation(){
 	enable = false;
 }
+bool is_enabled(){
+	return enable;
+}
 // duty cycle
 int set_duty_cycle(int val){
 	// update target_duty_cycle
@@ -58,25 +50,5 @@ int get_duty_cycle(){
 // temperature
 float get_temp(){
 	return temperature;
-}
-// Get / set state
-void get_state(TR_state &state){
-	// Allows quick extraction of info
-	state._enable = enable;
-	state._target_duty_cycle = target_duty_cycle;
-	state._update = false;
-	state._temp = temperature;
-	state._current_duty_cycle = current_duty_cycle;
-}
-void set_state(TR_state &state){
-	// Allows quick configuration of info
-	// Only update if flag is set
-	if(state._update){
-		state._update = false;
-		enable = state._enable;
-		target_duty_cycle = state._target_duty_cycle;
-	}
-	
-	// don't update temp_volt, temperature or current_duty_cycle
 }
 };

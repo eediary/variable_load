@@ -1,16 +1,17 @@
 #include "User_Interface.h"
 
-User_Interface::User_Interface(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r, HAL_Timer &Timer_r): 
-	_LR_state(LR_state_r),
-	_TR_state(TR_state_r),
+User_Interface::User_Interface(LoadRegulator &LR_ref, TempRegulator &TR_ref, HAL_Timer &Timer_r): 
+	LR_r(LR_ref),
+	TR_r(TR_ref),
 	Timer(Timer_r),
 	Enc(SCH_UI_A_PORT, SCH_UI_A_PIN, SCH_UI_B_PORT, SCH_UI_B_PIN, SCH_UI_BTN_PORT, SCH_UI_BTN_PIN, Timer, SCH_UI_ENC_LEAD),
 	Lcd(SCH_UI_LCD_ADDR),
-	VL_screen(_LR_state, _TR_state),
+	// screens
+	VL_screen(LR_ref, TR_ref),
 	Main_menu_screen(),
-	LR_Mode_screen(_LR_state, LR_Val_screen),
-	LR_Val_screen(_LR_state),
-	TR_Val_screen(_TR_state),
+	LR_Mode_screen(LR_ref, LR_Val_screen),
+	LR_Val_screen(LR_ref),
+	TR_Val_screen(TR_ref),
 	Info_screen()
 {
 	// Initialize variables

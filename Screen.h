@@ -67,10 +67,10 @@ class VL_Screen : public Screen{
 	private:
 		void res_to_text(float val, char* dest, int width, int prec);
 		virtual void update_text();
-		LoadRegulator::LR_state &_LR_state;
-		TempRegulator::TR_state &_TR_state;
+		LoadRegulator &_LR_r;
+		TempRegulator &_TR_r;
 	public:
-		VL_Screen(LoadRegulator::LR_state &LR_state_r, TempRegulator::TR_state &TR_state_r);
+		VL_Screen(LoadRegulator &LR_ref, TempRegulator &TR_ref);
 		virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 
@@ -106,9 +106,9 @@ private:
 	LoadRegulator::operation_mode local_op_mode; // op mode to use when updating
 	bool use_local_op_mode; // use local op mode if coming from LR Mode screen
 	virtual void update_text();
-	LoadRegulator::LR_state &_LR_state;
+	LoadRegulator &_LR_r;
 public:
-	LR_Val_Screen(LoadRegulator::LR_state &LR_state_r);
+	LR_Val_Screen(LoadRegulator &LR_ref);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 	void update_op_mode(LoadRegulator::operation_mode mode);
 	LoadRegulator::operation_mode get_op_mode();
@@ -122,11 +122,11 @@ public:
 #define LR_MODE_LINE_5 " OFF"
 class LR_Mode_Screen : public Screen{
 	private:
-	LoadRegulator::LR_state &_LR_state;
+	LoadRegulator &_LR_r;
 	LR_Val_Screen &_LR_Val_Screen;
 	virtual void update_text();
 	public:
-	LR_Mode_Screen(LoadRegulator::LR_state &LR_state_r, LR_Val_Screen &LR_Val_Screen_r);
+	LR_Mode_Screen(LoadRegulator &LR_ref, LR_Val_Screen &LR_Val_Screen_r);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 /********************* TR Val screen *********************/
@@ -136,9 +136,9 @@ private:
 	int index; // used to determine duty cycle
 	int index_to_duty_cycle();
 	virtual void update_text();
-	TempRegulator::TR_state &_TR_state;
+	TempRegulator &_TR_r;
 public:
-	TR_Val_Screen(TempRegulator::TR_state &TR_state_r);
+	TR_Val_Screen(TempRegulator &TR_ref);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 /********************* Info screen *********************/

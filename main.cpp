@@ -32,14 +32,8 @@ int main(void)
 	// Temperature Regulator constructor
 	TempRegulator TempReg(MainTimer);
 	
-	// state variable
-	LoadRegulator::LR_state LR_state_var;
-	LoadReg.get_state(LR_state_var);
-	TempRegulator::TR_state TR_state_var;
-	TempReg.get_state(TR_state_var);
-	
 	// User Interface constructor
-	User_Interface UI(LR_state_var, TR_state_var, MainTimer);
+	User_Interface UI(LoadReg, TempReg, MainTimer);
 	
 	// Debugger constructor
 	#if DEBUG == 1
@@ -59,25 +53,18 @@ int main(void)
     {
 		// Run load regulator and update state
 		LoadReg.regulate();
-		LoadReg.get_state(LR_state_var);
 		
 		// Run temp regulator and update state
 		TempReg.regulate();
-		TempReg.get_state(TR_state_var);
 		
 		// Run user interface
 		UI.update_screen();
 		
 		// Fail-safe
-		if(TR_state_var._temp >= SET_MAX_TEMP){
+		if(TempReg.get_temp() >= SET_MAX_TEMP){
 			// Load is too hot; disable load regulator
-			LR_state_var._op_mode = LoadRegulator::OFF;
-			LR_state_var._update = true;
+			LoadReg.set_mode(LoadRegulator::OFF);
 		}
-		
-		// Update regulators
-		LoadReg.set_state(LR_state_var);
-		TempReg.set_state(TR_state_var);
 		
 		// Run debugger
 		#if DEBUG == 1
