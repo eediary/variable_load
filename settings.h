@@ -82,7 +82,7 @@
 
 /********************* User Interface *********************/
 // Encoder
-#define SET_UI_ENC_LONG_PRESS_THRESH (1000) // time necessary to be considered long press, in ms
+#define SET_UI_ENC_LONG_PRESS_THRESH (600) // time necessary to be considered long press, in units of main timer
 // LCD
 #define SET_UI_LCD_UPDATE_PERIOD (1000) // time between full screen updates, in units of main timer
 #define SET_UI_LCD_CLEAR_PERIOD (2) // time needed for clearing screen, in units of main timer
