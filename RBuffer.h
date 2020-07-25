@@ -5,7 +5,7 @@
 #define RBUFFER_INDEX_INC(x) (x = (((x) >= ((N)-1)) ? (0) : (x+1)))
 
 // use template to set ring buffer data type and size
-template <class T, int N>
+template <typename T, int N, typename sumT = long>
 class RBuffer{
 private:
 	// buffer
@@ -15,7 +15,7 @@ private:
 	int read_index;
 	// number of elements & sum
 	int num_ele;
-	long sum;
+	sumT sum;
 	// flags
 	bool overflow;
 public:
@@ -82,7 +82,7 @@ public:
 	int get_num_ele(){
 		return num_ele;
 	}
-	long get_sum(){
+	sumT get_sum(){
 		return sum;
 	}
 	bool get_overflow(){

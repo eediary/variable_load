@@ -9,7 +9,9 @@ LoadRegulator::LoadRegulator():
 	LR_VMON_CS(SCH_ADS8685_CS_PORT, SCH_ADS8685_CS_PIN, SCH_ADS8685_CS_DIR, SCH_ADS8685_CS_VAL),
 	current_monitor(LR_TWI, SCH_LTC2451_REF),
 	current_control(LR_CUR_CONT_CS, LR_SPI, SCH_MAX5216_REF, MAX5216::OUT_GND_1K),
-	volt_monitor(LR_VMON_CS, LR_SPI)
+	volt_monitor(LR_VMON_CS, LR_SPI),
+	curr_buffer(),
+	volt_buffer()
 {
 	// Enable timer interrupt
 	LR_Timer.enable_int();
@@ -53,6 +55,9 @@ void LoadRegulator::regulate(){
 			// current read was successful
 			measured_current = SCH_VOLT_TO_AMP(cur_mon_volt, cal_zero);
 			
+			// update ring buffer
+			curr_buffer.push(measured_current);
+			
 			// increase offset by difference of desired and measured current
 			// only update offset if new calculated offset is within limits
 			float new_offset = offset + (desired_current - measured_current);
@@ -67,6 +72,8 @@ void LoadRegulator::regulate(){
 		last_desired_time = cur_time;
 		// measure voltage across load
 		measured_voltage = SCH_ADS8685_GAIN * volt_monitor.read();
+		// update ring buffer
+		volt_buffer.push(measured_voltage);
 		
 		// calculate desired current and DAC output
 		switch(op_mode){

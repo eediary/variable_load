@@ -14,6 +14,8 @@
 #include "LTC2451.h"
 #include "MAX5216.h"
 #include "RBuffer.h"
+// Software headers
+#include "RBuffer.h"
 
 class LoadRegulator{
 public:
@@ -32,6 +34,9 @@ HAL_GPIO LR_VMON_CS;
 LTC2451 current_monitor;
 MAX5216 current_control;
 ADS8685 volt_monitor;
+// Ring buffers
+RBuffer <float, SET_LR_MEAS_CURR_SAMPLES, float> curr_buffer;
+RBuffer <float, SET_LR_MEAS_VOLT_SAMPLES, float> volt_buffer;
 // Data
 float cal_zero; // voltage at zero current
 float target_current; // target current in CC mode, in amps
@@ -75,6 +80,9 @@ float get_measured_current(){
 	// returns measured current in amps
 	return measured_current;
 }
+float get_average_current(){
+	return curr_buffer.get_average();
+}
 float get_desired_current(){
 	return desired_current;
 }
@@ -103,6 +111,9 @@ float get_target_resistance(){
 float get_measured_voltage(){
 	// returns measured volt in volts
 	return measured_voltage;
+}
+float get_average_voltage(){
+	return volt_buffer.get_average();
 }
 void set_target_voltage(float val){
 	// val is in volts
