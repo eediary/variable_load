@@ -34,7 +34,6 @@ Info_Screen Info_screen;
 // Data members
 int cur_col, cur_row; // col and row to print
 long last_update; // last time screen was updated
-bool wait_for_clear_flag;
 bool print_flag; // flag to print
 Screen *cur_screen; // pointer to current screen
 char screen_chars[SCH_UI_LCD_ROWS][SCH_UI_LCD_COLS+1]; // characters to print

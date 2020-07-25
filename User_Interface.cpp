@@ -1,25 +1,24 @@
 #include "User_Interface.h"
 
-User_Interface::User_Interface(LoadRegulator &LR_ref, TempRegulator &TR_ref, HAL_Timer &Timer_r): 
-	LR_r(LR_ref),
-	TR_r(TR_ref),
-	Timer(Timer_r),
-	Enc(SCH_UI_A_PORT, SCH_UI_A_PIN, SCH_UI_B_PORT, SCH_UI_B_PIN, SCH_UI_BTN_PORT, SCH_UI_BTN_PIN, Timer, SCH_UI_ENC_LEAD),
-	Lcd(SCH_UI_LCD_ADDR),
-	DBG_LED(SET_LED_UI_PORT, SET_LED_UI_PIN, SET_LED_UI_ACTIVE),
-	// screens
-	VL_screen(LR_ref, TR_ref),
-	Main_menu_screen(),
-	LR_Mode_screen(LR_ref, LR_Val_screen),
-	LR_Val_screen(LR_ref),
-	TR_Val_screen(TR_ref),
-	Info_screen()
+User_Interface::User_Interface(LoadRegulator &LR_ref, TempRegulator &TR_ref, HAL_Timer &Timer_r):
+LR_r(LR_ref),
+TR_r(TR_ref),
+Timer(Timer_r),
+Enc(SCH_UI_A_PORT, SCH_UI_A_PIN, SCH_UI_B_PORT, SCH_UI_B_PIN, SCH_UI_BTN_PORT, SCH_UI_BTN_PIN, Timer, SCH_UI_ENC_LEAD),
+Lcd(SCH_UI_LCD_ADDR),
+DBG_LED(SET_LED_UI_PORT, SET_LED_UI_PIN, SET_LED_UI_ACTIVE),
+// screens
+VL_screen(LR_ref, TR_ref),
+Main_menu_screen(),
+LR_Mode_screen(LR_ref, LR_Val_screen),
+LR_Val_screen(LR_ref),
+TR_Val_screen(TR_ref),
+Info_screen()
 {
 	// Initialize variables
 	cur_row = 0;
 	cur_col = 0;
 	last_update = Timer.get_tick();
-	wait_for_clear_flag = false;
 	print_flag = false;
 	cur_screen = &VL_screen;
 	
@@ -37,33 +36,48 @@ void User_Interface::update_screen(){
 	// Done periodically or when input changes
 	unsigned long cur_time = Timer.get_tick();
 	if(
-		(cur_time - last_update > SET_UI_LCD_UPDATE_PERIOD) || 
-		(dir != Encoder::NONE) || 
-		(press != Encoder::NO_PUSH))
+	(cur_time - last_update > SET_UI_LCD_UPDATE_PERIOD) ||
+	(dir != Encoder::NONE) ||
+	(press != Encoder::NO_PUSH))
 	{
 		// DEBUG: turn LED on
 		DBG_LED.on();
 		
+		// Enough time has passed for screen to update, or user performed an action
+		last_update = cur_time;
+		
 		// Reset cursor, col and row
-		// Set and clear flags, preventing further execution until clear completes
+		// Set flag
 		Lcd.setCursor(0,0);
 		cur_col = 0;
 		cur_row = 0;
-		wait_for_clear_flag = true;
-		print_flag = false;
-		last_update = cur_time;
-	}
-	
-	// Check to see if clear has completed
-	if(wait_for_clear_flag && (cur_time - last_update > SET_UI_LCD_CLEAR_PERIOD)){
-		// DEBUG: turn LED on
-		DBG_LED.on();
-		
-		// Clear has completed
-		// Update screen_chars, set print flag, clear and set flags
-		cur_screen->update_screen_chars(screen_chars);
-		wait_for_clear_flag = false;
 		print_flag = true;
+		
+		// Handle user input
+		// Pass input to screen; update screen pointer
+		switch(cur_screen->handle_input(dir, press)){
+			case(Screen::VL_SCREEN):
+				cur_screen = &VL_screen;
+				break;
+			case(Screen::MAIN_MENU_SCREEN):
+				cur_screen = &Main_menu_screen;
+				break;
+			case(Screen::LR_MODE_SCREEN):
+				cur_screen = &LR_Mode_screen;
+				break;
+			case(Screen::LR_VAL_SCREEN):
+				cur_screen = &LR_Val_screen;
+				break;
+			case(Screen::TR_VAL_SCREEN):
+				cur_screen = &TR_Val_screen;
+				break;
+			case(Screen::INFO_SCREEN):
+				cur_screen = &Info_screen;
+				break;
+		}
+		
+		// Update characters to display on screen
+		cur_screen->update_screen_chars(screen_chars);
 	}
 	
 	// If enabled, print characters to screen
@@ -74,11 +88,8 @@ void User_Interface::update_screen(){
 			// end of current line
 			// either get next line, or stop printing since you're done with screen
 			if(++cur_row >= SCH_UI_LCD_ROWS){
-				// done printing screen; reset col and row, flag and cursor
+				// done printing screen; clear flag
 				print_flag = false;
-				cur_col = 0;
-				cur_row = 0;
-				Lcd.setCursor(0,0);
 			} else{
 				// get next line
 				Lcd.setCursor(0, cur_row);
@@ -90,28 +101,6 @@ void User_Interface::update_screen(){
 			Lcd.print(cur_char);
 			cur_col++;
 		}
-	}
-	
-	// Pass input to screen; update screen pointer
-	switch(cur_screen->handle_input(dir, press)){
-		case(Screen::VL_SCREEN):
-			cur_screen = &VL_screen;
-			break;
-		case(Screen::MAIN_MENU_SCREEN):
-			cur_screen = &Main_menu_screen;
-			break;
-		case(Screen::LR_MODE_SCREEN):
-			cur_screen = &LR_Mode_screen;
-			break;
-		case(Screen::LR_VAL_SCREEN):
-			cur_screen = &LR_Val_screen;
-			break;
-		case(Screen::TR_VAL_SCREEN):
-			cur_screen = &TR_Val_screen;
-			break;
-		case(Screen::INFO_SCREEN):
-			cur_screen = &Info_screen;
-			break;
 	}
 	
 	// DEBUG: turn LED off
