@@ -6,6 +6,8 @@
 #include "HAL_ADC.h"
 #include "HAL_PWM.h"
 #include "HAL_Timer.h"
+// Device headers
+#include "LED.h"
 
 class TempRegulator{
 public:
@@ -14,6 +16,8 @@ private:
 HAL_Timer &Timer;
 HAL_ADC Adc;
 HAL_PWM Pwm;
+// Device classes
+LED DBG_LED;
 
 // Data
 bool enable;

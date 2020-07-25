@@ -25,10 +25,7 @@ LoadRegulator &LR_r;
 TempRegulator &TR_r;
 HAL_Timer &Timer;
 HAL_UART Serial;
-LED LED_G;
-LED LED_B;
-LED LED_Y;
-LED LED_R;
+LED DBG_LED;
 // Data members
 unsigned long last_time; // last time called, in ms
 // Methods

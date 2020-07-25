@@ -6,6 +6,7 @@ User_Interface::User_Interface(LoadRegulator &LR_ref, TempRegulator &TR_ref, HAL
 	Timer(Timer_r),
 	Enc(SCH_UI_A_PORT, SCH_UI_A_PIN, SCH_UI_B_PORT, SCH_UI_B_PIN, SCH_UI_BTN_PORT, SCH_UI_BTN_PIN, Timer, SCH_UI_ENC_LEAD),
 	Lcd(SCH_UI_LCD_ADDR),
+	DBG_LED(SET_LED_UI_PORT, SET_LED_UI_PIN, SET_LED_UI_ACTIVE),
 	// screens
 	VL_screen(LR_ref, TR_ref),
 	Main_menu_screen(),
@@ -34,11 +35,15 @@ void User_Interface::update_screen(){
 	
 	// Clear screen so it can be updated
 	// Done periodically or when input changes
+	unsigned long cur_time = Timer.get_tick();
 	if(
-		(Timer.get_tick() - last_update > SET_UI_LCD_UPDATE_PERIOD) || 
+		(cur_time - last_update > SET_UI_LCD_UPDATE_PERIOD) || 
 		(dir != Encoder::NONE) || 
 		(press != Encoder::NO_PUSH))
 	{
+		// DEBUG: turn LED on
+		DBG_LED.on();
+		
 		// Reset cursor, col and row
 		// Set and clear flags, preventing further execution until clear completes
 		Lcd.setCursor(0,0);
@@ -46,11 +51,14 @@ void User_Interface::update_screen(){
 		cur_row = 0;
 		wait_for_clear_flag = true;
 		print_flag = false;
-		last_update = Timer.get_tick();
+		last_update = cur_time;
 	}
 	
 	// Check to see if clear has completed
-	if(wait_for_clear_flag && (Timer.get_tick() - last_update > SET_UI_LCD_CLEAR_PERIOD)){
+	if(wait_for_clear_flag && (cur_time - last_update > SET_UI_LCD_CLEAR_PERIOD)){
+		// DEBUG: turn LED on
+		DBG_LED.on();
+		
 		// Clear has completed
 		// Update screen_chars, set print flag, clear and set flags
 		cur_screen->update_screen_chars(screen_chars);
@@ -105,4 +113,7 @@ void User_Interface::update_screen(){
 			cur_screen = &Info_screen;
 			break;
 	}
+	
+	// DEBUG: turn LED off
+	DBG_LED.off();
 }

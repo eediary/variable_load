@@ -10,6 +10,7 @@ LoadRegulator::LoadRegulator():
 	current_monitor(LR_TWI, SCH_LTC2451_REF),
 	current_control(LR_CUR_CONT_CS, LR_SPI, SCH_MAX5216_REF, MAX5216::OUT_GND_1K),
 	volt_monitor(LR_VMON_CS, LR_SPI),
+	DBG_LED(SET_LED_LR_PORT, SET_LED_LR_PIN, SET_LED_LR_ACTIVE),
 	curr_buffer(),
 	volt_buffer()
 {
@@ -45,6 +46,9 @@ void LoadRegulator::regulate(){
 	
 	// see if offset needs to be updated
 	if(cur_time - last_offset_time > SET_LR_OFFSET_UPDATE_PERIOD){
+		// DEBUG: turn LED on
+		DBG_LED.on();
+		
 		// enough time has passed that offset must be adjusted
 		last_offset_time = cur_time;
 		
@@ -68,6 +72,9 @@ void LoadRegulator::regulate(){
 	
 	// see if desired current & output needs to be updated
 	if(cur_time - last_desired_time > SET_LR_DESIRED_UPDATE_PERIOD){
+		// DEBUG: turn LED on
+		DBG_LED.on();
+		
 		// enough time has passed that desired current and DAC output must be adjusted
 		last_desired_time = cur_time;
 		// measure voltage across load
@@ -111,6 +118,9 @@ void LoadRegulator::regulate(){
 			current_control.set_output(SCH_AMP_TO_VOLT(desired_current + offset, cal_zero));
 		}
 	}
+	
+	// DEBUG: turn LED off
+	DBG_LED.off();
 }
 void LoadRegulator::calibrate_zero(){
 	// Sets cal_zero to average of several current monitor readings

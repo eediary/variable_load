@@ -7,6 +7,7 @@
 // Device headers
 #include "Encoder.h"
 #include "LiquidCrystal_PCF8574.h"
+#include "LED.h"
 // Software headers
 #include "Screen.h"
 // Module headers
@@ -22,6 +23,7 @@ TempRegulator &TR_r;
 HAL_Timer &Timer;
 Encoder Enc;
 LiquidCrystal_PCF8574 Lcd;
+LED DBG_LED;
 // Screens
 VL_Screen VL_screen;
 Main_Menu_Screen Main_menu_screen;

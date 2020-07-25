@@ -14,6 +14,7 @@
 #include "LTC2451.h"
 #include "MAX5216.h"
 #include "RBuffer.h"
+#include "LED.h"
 // Software headers
 #include "RBuffer.h"
 
@@ -34,6 +35,7 @@ HAL_GPIO LR_VMON_CS;
 LTC2451 current_monitor;
 MAX5216 current_control;
 ADS8685 volt_monitor;
+LED DBG_LED;
 // Ring buffers
 RBuffer <float, SET_LR_MEAS_CURR_SAMPLES, float> curr_buffer;
 RBuffer <float, SET_LR_MEAS_VOLT_SAMPLES, float> volt_buffer;

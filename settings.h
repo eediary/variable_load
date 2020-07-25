@@ -72,6 +72,19 @@
 #define SET_DEBUGGER_FP_DECIMALS (2)
 // Baud rate
 #define SET_DEBUGGER_BAUD (57600)
+// LED assignment
+#define SET_LED_DB_PORT (SCH_LED_BLUE_PORT)
+#define SET_LED_DB_PIN  (SCH_LED_BLUE_PIN)
+#define SET_LED_DB_ACTIVE (SCH_LED_BLUE_ACTIVE)
+#define SET_LED_LR_PORT (SCH_LED_GREEN_PORT)
+#define SET_LED_LR_PIN  (SCH_LED_GREEN_PIN)
+#define SET_LED_LR_ACTIVE (SCH_LED_GREEN_ACTIVE)
+#define SET_LED_TR_PORT (SCH_LED_YELLOW_PORT)
+#define SET_LED_TR_PIN  (SCH_LED_YELLOW_PIN)
+#define SET_LED_TR_ACTIVE (SCH_LED_YELLOW_ACTIVE)
+#define SET_LED_UI_PORT (SCH_LED_RED_PORT)
+#define SET_LED_UI_PIN  (SCH_LED_RED_PIN)
+#define SET_LED_UI_ACTIVE (SCH_LED_RED_ACTIVE)
 
 /********************* Temp Regulator *********************/
 // Temp regulator period

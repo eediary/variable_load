@@ -5,10 +5,7 @@ Debugger::Debugger(LoadRegulator &LoadRegulator_r, TempRegulator &TempRegulator_
 	TR_r(TempRegulator_r),
 	Timer(Timer_r),
 	Serial(SET_DEBUGGER_BAUD, SCH_UART_MODE, SET_UART_DATA_BITS, SET_UART_PARITY, SET_UART_STOP_BITS),
-	LED_G(SCH_LED_GREEN_PORT, SCH_LED_GREEN_PIN, SCH_LED_GREEN_ACTIVE),
-	LED_B(SCH_LED_BLUE_PORT, SCH_LED_BLUE_PIN, SCH_LED_BLUE_ACTIVE),
-	LED_Y(SCH_LED_YELLOW_PORT, SCH_LED_YELLOW_PIN, SCH_LED_YELLOW_ACTIVE),
-	LED_R(SCH_LED_RED_PORT, SCH_LED_RED_PIN, SCH_LED_RED_ACTIVE)
+	DBG_LED(SET_LED_DB_PORT, SET_LED_DB_PIN, SET_LED_DB_ACTIVE)
 {
 	// Initialize last time
 	last_time = 0;
@@ -19,9 +16,13 @@ Debugger::Debugger(LoadRegulator &LoadRegulator_r, TempRegulator &TempRegulator_
 }
 
 void Debugger::run_debugger(){
-	if(Timer.get_tick() - last_time > SET_DEBUGGER_PERIOD){
+	unsigned long cur_time = Timer.get_tick();
+	if(cur_time - last_time > SET_DEBUGGER_PERIOD){
+		// DEBUG: turn LED on
+		DBG_LED.on();
+		
 		// Sufficient time has passed; run debugger
-		last_time = Timer.get_tick();
+		last_time = cur_time;
 		
 		// Update values to report
 		float LR_measured_voltage = LR_r.get_measured_voltage();
@@ -30,7 +31,6 @@ void Debugger::run_debugger(){
 		float LR_offset = LR_r.get_offset();
 	
 		// Construct string
-		LED_G.on();
 		switch(LR_r.get_mode()){
 			case(LoadRegulator::CC):
 				// Mode
@@ -120,7 +120,6 @@ void Debugger::run_debugger(){
 		
 		// Transmit strings
 		Serial.send_string_int(char_tx_buffer);
-		LED_G.off();
 	
 		// Check input
 		if(Serial.read_rx_buffer(char_rx_buffer, SET_UART_RX_BUFFER_SIZE)){
@@ -163,6 +162,9 @@ void Debugger::run_debugger(){
 				// Do nothing
 				Serial.send_string("Invalid input.\r\n");
 		}
+	
+	// DEBUG: turn LED off
+	DBG_LED.off();
 	}
 }
 
