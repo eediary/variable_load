@@ -32,7 +32,7 @@
 #define SET_LR_CAL_AMOUNT (10) // number of samples to average
 #define SET_LR_CAL_FLUSH_AMOUNT (5) // number of samples to discard
 // Target max values
-#define SET_LR_CUR_MAX (10) // in amps
+#define SET_LR_CUR_MAX (30) // in amps
 #define SET_LR_POW_MAX (400) // in watts
 #define SET_LR_RES_MAX (999.99) // in ohms
 #define SET_LR_VOLT_MAX (30) // in volts
