@@ -64,9 +64,12 @@ void LoadRegulator::regulate(){
 			
 			// increase offset by difference of desired and measured current
 			// only update offset if new calculated offset is within limits
-			float new_offset = offset + (desired_current - measured_current);
-			if((new_offset > SET_LR_OFFSET_MIN) && (new_offset < SET_LR_OFFSET_MAX))
-				offset = new_offset;
+			offset += (desired_current - measured_current) * SET_LR_CUR_ERROR_SCALER;
+			if(offset < SET_LR_OFFSET_MIN){
+				offset = SET_LR_OFFSET_MIN;
+			} else if(offset > SET_LR_OFFSET_MAX){
+				offset = SET_LR_OFFSET_MAX;
+			}
 		}
 	}
 	

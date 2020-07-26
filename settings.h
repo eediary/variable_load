@@ -25,7 +25,7 @@
 #define SET_LR_CAL_DELAY_PERIOD (100) // delay time for calibration, in units of LR timer
 // offset limits
 #define SET_LR_OFFSET_MIN (-0.05) // offset minimum, in amps
-#define SET_LR_OFFSET_MAX (0.05) // offset maxcimum, in amps
+#define SET_LR_OFFSET_MAX (0.05) // offset maximum, in amps
 // Current control parameters
 #define SET_LR_CUR_ERROR_SCALER (0.5)
 // Zero current calibration amount
