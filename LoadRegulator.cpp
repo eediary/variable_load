@@ -113,6 +113,7 @@ void LoadRegulator::regulate(){
 		// Update DAC output
 		if(desired_current == 0){
 			// zero current is special case
+			offset = 0; // prevent offset from wandering during zero current condition
 			current_control.set_output(SCH_ZERO_AMP_VOLT);
 		} else{
 			current_control.set_output(SCH_AMP_TO_VOLT(desired_current + offset, cal_zero));
