@@ -25,8 +25,8 @@ void Debugger::run_debugger(){
 		last_time = cur_time;
 		
 		// Update values to report
-		float LR_measured_voltage = LR_r.get_measured_voltage();
-		float LR_measured_current = LR_r.get_measured_current();
+		float LR_measured_voltage = LR_r.get_average_voltage();
+		float LR_measured_current = LR_r.get_average_current();
 		float LR_desired_current = LR_r.get_desired_current();
 		float LR_offset = LR_r.get_offset();
 	
