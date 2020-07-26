@@ -88,7 +88,7 @@
 
 /********************* Temp Regulator *********************/
 // Temp regulator period
-#define SET_TR_PERIOD (100) // in units of main timer
+#define SET_TR_PERIOD (500) // in units of main timer
 #define SET_TR_ADC_ADJ (HAL_ADC::ADC_RADJUST)
 #define SET_TR_TEMP_MIN (35)
 #define SET_TR_TEMP_MAX (65)
