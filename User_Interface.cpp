@@ -82,6 +82,9 @@ void User_Interface::update_screen(){
 	
 	// If enabled, print characters to screen
 	if(print_flag){
+		// DEBUG: turn LED on
+		DBG_LED.on();
+		
 		// Print screen_chars
 		char cur_char = screen_chars[cur_row][cur_col];
 		if(cur_col >= SCH_UI_LCD_COLS){
