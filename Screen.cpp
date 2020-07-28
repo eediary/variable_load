@@ -198,7 +198,9 @@ Screen::SCREEN_ID VL_Screen::handle_input(Encoder::Encoder_Dir dir, Encoder::Enc
 	return Screen::VL_SCREEN;
 }
 /********************* Main Menu screen *********************/
-Main_Menu_Screen::Main_Menu_Screen(){
+Main_Menu_Screen::Main_Menu_Screen(LoadRegulator &LR_ref):
+	_LR_r(LR_ref)
+{
 	// Initialize data
 	row_offset = 0;
 	cursor_row = 1;
@@ -228,8 +230,11 @@ Screen::SCREEN_ID Main_Menu_Screen::handle_input(Encoder::Encoder_Dir dir, Encod
 				// Go to LR mode screen
 				return Screen::LR_MODE_SCREEN;
 			case(2):
-				// Go to LR val screen
-				return Screen::LR_VAL_SCREEN;
+				// Go to LR mode if mode is OFF; otherwise go to val screen
+				if(_LR_r.get_mode() == LoadRegulator::OFF)
+					return Screen::LR_MODE_SCREEN;
+				else
+					return Screen::LR_VAL_SCREEN;
 			case(3):
 				// Go to TR val screen
 				return Screen::TR_VAL_SCREEN;
@@ -561,6 +566,7 @@ _TR_r(TR_ref)
 	cursor_row_min = 0;
 	show_cursor = false;
 	number_of_rows = TR_VAL_SIZE;
+	index = 0;
 	
 	strcpy(text[0], TR_VAL_LINE_0);	
 }

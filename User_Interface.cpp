@@ -9,7 +9,7 @@ Lcd(SCH_UI_LCD_ADDR),
 DBG_LED(SET_LED_UI_PORT, SET_LED_UI_PIN, SET_LED_UI_ACTIVE),
 // screens
 VL_screen(LR_ref, TR_ref),
-Main_menu_screen(),
+Main_menu_screen(LR_ref),
 LR_Mode_screen(LR_ref, LR_Val_screen),
 LR_Val_screen(LR_ref),
 TR_Val_screen(TR_ref),

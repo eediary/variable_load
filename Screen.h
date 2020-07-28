@@ -82,9 +82,10 @@ class VL_Screen : public Screen{
 #define MAIN_MENU_LINE_4 " Info"
 class Main_Menu_Screen : public Screen{
 private:
+	LoadRegulator &_LR_r;
 	virtual void update_text();
 public:
-	Main_Menu_Screen();
+	Main_Menu_Screen(LoadRegulator &LR_ref);
 	virtual SCREEN_ID handle_input(Encoder::Encoder_Dir dir, Encoder::Encoder_Button btn);
 };
 
